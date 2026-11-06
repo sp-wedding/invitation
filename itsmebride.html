@@ -1,0 +1,1492 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-9BR6ERWH32"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-9BR6ERWH32');
+  </script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bride's Portal • Sriraksha & Pannaga Wedding Invitation Manager</title>
+  <link rel="icon" type="image/svg+xml" href="assets/ganesha-gold.svg">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Noto+Serif+Kannada:wght@500;700&family=Outfit:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Caveat:wght@600;700&display=swap"
+    rel="stylesheet">
+
+  <!-- Font Awesome 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Firebase Compat SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+  <!-- External Firebase Config -->
+  <script src="firebase-config.js"></script>
+
+  <style>
+    :root {
+      --bg-dark: #19030B;
+      --bg-surface: #280512;
+      --bg-surface-elevated: #36081A;
+      --gold-primary: #E5C378;
+      --gold-light: #FFF0BD;
+      --gold-dark: #C4973B;
+      --gold-gradient: linear-gradient(135deg, #FFF0BD 0%, #E5C378 45%, #C4973B 100%);
+      --text-white: #FFFFFF;
+      --text-gold: #F3E5C8;
+      --text-muted: #D1B892;
+      --border-gold: rgba(229, 195, 120, 0.35);
+      --font-royal: 'Cinzel', serif;
+      --font-body: 'Outfit', sans-serif;
+      --font-script: 'Caveat', cursive;
+      --font-kannada: 'Noto Serif Kannada', serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--bg-dark);
+      background-image:
+        radial-gradient(circle at 10% 15%, rgba(229, 195, 120, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 90% 85%, rgba(196, 151, 59, 0.08) 0%, transparent 40%);
+      color: var(--text-white);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      padding: 20px 16px 60px;
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    /* Header */
+    .admin-header {
+      text-align: center;
+      margin-bottom: 28px;
+      position: relative;
+    }
+
+    .ganesha-motif {
+      width: 52px;
+      height: 52px;
+      margin: 0 auto 10px;
+      display: block;
+      filter: drop-shadow(0 2px 8px rgba(229, 195, 120, 0.4));
+    }
+
+    .admin-title-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(229, 195, 120, 0.12);
+      border: 1px solid var(--border-gold);
+      padding: 5px 14px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--gold-light);
+      margin-bottom: 8px;
+    }
+
+    .admin-main-title {
+      font-family: var(--font-royal);
+      font-size: 1.85rem;
+      color: var(--gold-light);
+      letter-spacing: 1px;
+      margin-bottom: 4px;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
+    }
+
+    .admin-subtitle {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      font-style: italic;
+    }
+
+    /* Top Action Bar (Database status & Settings) */
+    .status-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-gold);
+      border-radius: 14px;
+      padding: 10px 16px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .db-status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #E5C378;
+      box-shadow: 0 0 8px #E5C378;
+    }
+
+    .status-dot.connected {
+      background: #10B981;
+      box-shadow: 0 0 10px #10B981;
+    }
+
+    .status-dot.local {
+      background: #F59E0B;
+      box-shadow: 0 0 10px #F59E0B;
+    }
+
+    .settings-btn {
+      background: rgba(229, 195, 120, 0.15);
+      border: 1px solid var(--border-gold);
+      color: var(--gold-light);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.25s ease;
+    }
+
+    .settings-btn:hover {
+      background: rgba(229, 195, 120, 0.28);
+      transform: translateY(-1px);
+    }
+
+    /* Metrics Grid */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .metric-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-gold);
+      border-radius: 16px;
+      padding: 16px;
+      text-align: center;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .metric-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--gold-gradient);
+    }
+
+    .metric-num {
+      font-family: var(--font-royal);
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--gold-light);
+      line-height: 1.2;
+    }
+
+    .metric-label {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-top: 4px;
+    }
+
+    /* Generator Box */
+    .generator-card {
+      background: var(--bg-surface);
+      border: 1.5px solid var(--border-gold);
+      border-radius: 20px;
+      padding: 24px;
+      margin-bottom: 28px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(229, 195, 120, 0.1);
+    }
+
+    .card-heading {
+      font-family: var(--font-royal);
+      font-size: 1.25rem;
+      color: var(--gold-light);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-desc {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin-bottom: 18px;
+    }
+
+    .input-group {
+      margin-bottom: 16px;
+    }
+
+    .input-label-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text-gold);
+    }
+
+    .char-count {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .char-count.limit {
+      color: #EF4444;
+      font-weight: 700;
+    }
+
+    .guest-input {
+      width: 100%;
+      background: rgba(18, 2, 7, 0.8);
+      border: 1.5px solid rgba(229, 195, 120, 0.4);
+      border-radius: 12px;
+      padding: 14px 16px;
+      color: #FFFFFF;
+      font-size: 1.1rem;
+      font-family: var(--font-body);
+      outline: none;
+      transition: all 0.25s ease;
+      box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.5);
+    }
+
+    .guest-input:focus {
+      border-color: var(--gold-primary);
+      box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.5), 0 0 12px rgba(229, 195, 120, 0.3);
+    }
+
+    /* Live handwriting preview */
+    .live-preview-box {
+      background: #FFFDF8;
+      border: 1.5px solid var(--gold-primary);
+      border-radius: 12px;
+      padding: 12px 18px;
+      margin-bottom: 18px;
+      color: #5C1226;
+      box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.08);
+    }
+
+    .live-preview-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #8C6D37;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .live-preview-name {
+      font-family: var(--font-script);
+      font-size: 1.55rem;
+      color: #5C1226;
+      line-height: 1.3;
+      min-height: 38px;
+    }
+
+    .quick-tags-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+
+    .quick-tag {
+      background: rgba(229, 195, 120, 0.12);
+      border: 1px dashed var(--border-gold);
+      color: var(--text-gold);
+      padding: 4px 10px;
+      border-radius: 16px;
+      font-size: 0.78rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .quick-tag:hover {
+      background: rgba(229, 195, 120, 0.28);
+      color: var(--gold-light);
+      border-color: var(--gold-primary);
+    }
+
+    .generate-btn {
+      width: 100%;
+      background: var(--gold-gradient);
+      color: #21040D;
+      border: 2px solid #FFF2C7;
+      border-radius: 30px;
+      padding: 14px 24px;
+      font-family: var(--font-body);
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45), 0 0 14px rgba(229, 195, 120, 0.35);
+      transition: all 0.25s ease;
+    }
+
+    .generate-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 26px rgba(0, 0, 0, 0.6), 0 0 20px rgba(229, 195, 120, 0.55);
+    }
+
+    .generate-btn:active {
+      transform: scale(0.98);
+    }
+
+    /* Search & Filter Header */
+    .list-header-box {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    @media (min-width: 640px) {
+      .list-header-box {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+      }
+    }
+
+    .search-input-wrapper {
+      position: relative;
+      flex: 1;
+      max-width: 450px;
+    }
+
+    .search-input-wrapper i {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--gold-primary);
+      font-size: 0.95rem;
+    }
+
+    .search-input {
+      width: 100%;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-gold);
+      border-radius: 25px;
+      padding: 10px 16px 10px 38px;
+      color: #FFFFFF;
+      font-size: 0.92rem;
+      outline: none;
+      transition: all 0.25s ease;
+    }
+
+    .search-input:focus {
+      border-color: var(--gold-primary);
+      box-shadow: 0 0 10px rgba(229, 195, 120, 0.25);
+    }
+
+    .export-btn {
+      background: rgba(229, 195, 120, 0.15);
+      border: 1px solid var(--border-gold);
+      color: var(--gold-light);
+      padding: 10px 18px;
+      border-radius: 25px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.25s ease;
+      white-space: nowrap;
+    }
+
+    .export-btn:hover {
+      background: rgba(229, 195, 120, 0.28);
+      transform: translateY(-1px);
+    }
+
+    /* Invitations List / Cards */
+    .invitations-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .invitation-item-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-gold);
+      border-radius: 16px;
+      padding: 16px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      transition: all 0.25s ease;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+    }
+
+    @media (min-width: 680px) {
+      .invitation-item-card {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+      }
+    }
+
+    .invitation-item-card:hover {
+      border-color: var(--gold-primary);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 14px rgba(229, 195, 120, 0.15);
+    }
+
+    .item-info-col {
+      flex: 1;
+    }
+
+    .item-name-title {
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: #FFFFFF;
+      margin-bottom: 6px;
+    }
+
+    .item-meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .code-badge {
+      background: rgba(229, 195, 120, 0.2);
+      border: 1px solid var(--gold-primary);
+      color: var(--gold-light);
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-family: monospace;
+      font-size: 0.88rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+
+    .view-count-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      color: #A3E635;
+      font-weight: 600;
+    }
+
+    .view-count-badge.unopened {
+      color: #9CA3AF;
+    }
+
+    .item-actions-col {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .action-icon-btn {
+      background: rgba(229, 195, 120, 0.12);
+      border: 1px solid var(--border-gold);
+      color: var(--gold-light);
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 0.95rem;
+      text-decoration: none;
+    }
+
+    .action-icon-btn:hover {
+      background: rgba(229, 195, 120, 0.35);
+      transform: scale(1.08);
+      color: #FFFFFF;
+    }
+
+    .action-icon-btn.whatsapp-btn {
+      color: #25D366;
+      border-color: rgba(37, 211, 102, 0.4);
+    }
+
+    .action-icon-btn.whatsapp-btn:hover {
+      background: rgba(37, 211, 102, 0.25);
+    }
+
+    .action-icon-btn.delete-btn {
+      color: #EF4444;
+      border-color: rgba(239, 68, 68, 0.3);
+    }
+
+    .action-icon-btn.delete-btn:hover {
+      background: rgba(239, 68, 68, 0.25);
+    }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      background: var(--bg-surface);
+      border: 1px dashed var(--border-gold);
+      border-radius: 16px;
+      color: var(--text-muted);
+    }
+
+    .empty-state i {
+      font-size: 2.5rem;
+      color: var(--gold-primary);
+      margin-bottom: 12px;
+      opacity: 0.8;
+    }
+
+    /* Modal / Popup */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.82);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .modal-backdrop.open {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal-card {
+      background: var(--bg-surface);
+      border: 2px solid var(--gold-primary);
+      border-radius: 24px;
+      max-width: 500px;
+      width: 100%;
+      padding: 28px 24px;
+      box-shadow: 0 16px 45px rgba(0, 0, 0, 0.7), 0 0 25px rgba(229, 195, 120, 0.3);
+      text-align: center;
+      transform: scale(0.92);
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .modal-backdrop.open .modal-card {
+      transform: scale(1);
+    }
+
+    .modal-badge-icon {
+      width: 60px;
+      height: 60px;
+      margin: 0 auto 12px;
+      border-radius: 50%;
+      background: var(--gold-gradient);
+      color: #21040D;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+    }
+
+    .modal-title {
+      font-family: var(--font-royal);
+      font-size: 1.5rem;
+      color: var(--gold-light);
+      margin-bottom: 6px;
+    }
+
+    .modal-subtitle {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin-bottom: 18px;
+    }
+
+    .guest-pill-display {
+      background: #FFFDF8;
+      border: 1px solid var(--gold-primary);
+      border-radius: 12px;
+      padding: 10px 14px;
+      color: #5C1226;
+      font-family: var(--font-script);
+      font-size: 1.45rem;
+      margin-bottom: 16px;
+      line-height: 1.3;
+    }
+
+    .link-copy-box {
+      background: rgba(15, 2, 6, 0.8);
+      border: 1px solid var(--border-gold);
+      border-radius: 12px;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .link-copy-text {
+      flex: 1;
+      font-family: monospace;
+      font-size: 0.85rem;
+      color: var(--gold-light);
+      word-break: break-all;
+      text-align: left;
+    }
+
+    .modal-btn-row {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    @media (min-width: 440px) {
+      .modal-btn-row {
+        flex-direction: row;
+      }
+    }
+
+    .modal-btn {
+      flex: 1;
+      padding: 12px 18px;
+      border-radius: 25px;
+      font-size: 0.92rem;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.25s ease;
+      text-decoration: none;
+    }
+
+    .btn-gold {
+      background: var(--gold-gradient);
+      color: #21040D;
+      box-shadow: 0 4px 12px rgba(229, 195, 120, 0.3);
+    }
+
+    .btn-gold:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(229, 195, 120, 0.5);
+    }
+
+    .btn-whatsapp {
+      background: linear-gradient(135deg, #25D366, #128C7E);
+      color: #FFFFFF;
+      box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
+    }
+
+    .btn-whatsapp:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(37, 211, 102, 0.5);
+    }
+
+    .btn-secondary {
+      background: rgba(229, 195, 120, 0.15);
+      border: 1px solid var(--border-gold);
+      color: var(--gold-light);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(229, 195, 120, 0.3);
+    }
+
+    /* Toast Notification */
+    .toast-msg {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: #10B981;
+      color: #FFFFFF;
+      padding: 10px 22px;
+      border-radius: 30px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      z-index: 20000;
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .toast-msg.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <!-- Header -->
+    <header class="admin-header">
+      <img src="assets/ganesha-gold.svg" alt="Lord Ganesha" class="ganesha-motif">
+      <div class="admin-title-badge">
+        <i class="fa-solid fa-gem"></i> Bride's Management Portal
+      </div>
+      <h1 class="admin-main-title">Sriraksha & Pannaga</h1>
+      <p class="admin-subtitle">Digital Wedding Invitation Distribution &amp; Guest Management</p>
+    </header>
+
+    <!-- Status Bar -->
+    <div class="status-bar">
+      <div class="db-status-pill" id="dbStatusPill">
+        <div class="status-dot" id="statusDot"></div>
+        <span id="statusText">Checking database connection...</span>
+      </div>
+      <div style="display: flex; gap: 8px;">
+        <a href="index.html" target="_blank" class="settings-btn" title="Open Invitation Card">
+          <i class="fa-solid fa-arrow-up-right-from-square"></i> View Invitation
+        </a>
+        <button class="settings-btn" onclick="openSettingsModal()">
+          <i class="fa-solid fa-gear"></i> Settings
+        </button>
+      </div>
+    </div>
+
+    <!-- Metrics Cards -->
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-num" id="totalCountDisplay">0</div>
+        <div class="metric-label">Invitations Created</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-num" id="totalViewsDisplay">0</div>
+        <div class="metric-label">Total Opens Recorded</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-num" id="activeRateDisplay">0%</div>
+        <div class="metric-label">Engagement Rate</div>
+      </div>
+    </div>
+
+    <!-- Generator Box -->
+    <div class="generator-card">
+      <h2 class="card-heading">
+        <i class="fa-solid fa-wand-magic-sparkles"></i> Generate New Invitation
+      </h2>
+      <p class="card-desc">
+        Enter the guest or family name exactly as you'd like it to appear on the luxury handwritten "To" envelope.
+      </p>
+
+      <form id="generateForm" onsubmit="handleGenerate(event)">
+        <div class="input-group">
+          <div class="input-label-row">
+            <span>Guest Name / Family Name</span>
+            <span class="char-count" id="charCount">0 / 100</span>
+          </div>
+          <input type="text" id="guestNameInput" class="guest-input"
+            placeholder="Ex: Manjunatha Udupa and Family, Bengaluru." maxlength="100" autocomplete="off" required
+            oninput="handleInputLive(this.value)">
+        </div>
+
+        <!-- Quick Append Tags -->
+        <div class="quick-tags-row">
+          <span style="font-size: 0.78rem; color: var(--text-muted); align-self: center;">Quick add:</span>
+          <button type="button" class="quick-tag" onclick="appendTag(' and Family')">+ and Family</button>
+          <button type="button" class="quick-tag" onclick="appendTag(' ಮತ್ತು ಪರಿವಾರ')">+ ಮತ್ತು ಪರಿವಾರ</button>
+          <button type="button" class="quick-tag" onclick="appendTag(', Bengaluru')">, Bengaluru</button>
+          <button type="button" class="quick-tag" onclick="appendTag(', Thirthahalli')">, Thirthahalli</button>
+          <button type="button" class="quick-tag" onclick="appendTag(', Shivamogga')">, Shivamogga</button>
+        </div>
+
+        <!-- Live Handwriting Card Preview -->
+        <div class="live-preview-box">
+          <div class="live-preview-label">Live Envelope "To" Preview:</div>
+          <div class="live-preview-name" id="livePreviewDisplay">Manjunatha Udupa and Family, Bengaluru.</div>
+        </div>
+
+        <button type="submit" class="generate-btn" id="generateSubmitBtn">
+          <i class="fa-solid fa-link"></i> Generate 8-Digit Unique Link
+        </button>
+      </form>
+    </div>
+
+    <!-- Search & Filter Bar -->
+    <div class="list-header-box">
+      <div class="search-input-wrapper">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" id="searchInput" class="search-input" placeholder="Search guests by name or 8-digit code..."
+          oninput="handleSearch(this.value)">
+      </div>
+      <button class="export-btn" onclick="exportToCSV()">
+        <i class="fa-solid fa-file-csv"></i> Export to Excel (CSV)
+      </button>
+    </div>
+
+    <!-- Invitations List -->
+    <div class="invitations-list" id="invitationsList">
+      <!-- Populated dynamically via JS -->
+    </div>
+
+  </div>
+
+  <!-- =========================================================================
+       MODAL 1: SHARE POPUP MODAL (ON GENERATION COMPLETE)
+       ========================================================================= -->
+  <div class="modal-backdrop" id="shareModal">
+    <div class="modal-card">
+      <div class="modal-badge-icon">
+        <i class="fa-solid fa-check"></i>
+      </div>
+      <h3 class="modal-title">Invitation Link Ready!</h3>
+      <p class="modal-subtitle">The unique 8-digit link has been created and saved to the database.</p>
+
+      <div class="guest-pill-display" id="modalGuestName">Manjunatha Udupa and Family</div>
+
+      <div style="margin-bottom: 12px; font-size: 0.88rem; color: var(--text-muted);">
+        Unique Passcode: <span class="code-badge" id="modalCodeBadge">at79hag6</span>
+      </div>
+
+      <div class="link-copy-box">
+        <span class="link-copy-text" id="modalShareUrlText">https://...</span>
+        <button type="button" class="action-icon-btn" onclick="copyModalLink()" title="Copy Link">
+          <i class="fa-regular fa-copy" id="modalCopyIcon"></i>
+        </button>
+      </div>
+
+      <div class="modal-btn-row">
+        <button type="button" class="modal-btn btn-gold" onclick="copyModalLink()">
+          <i class="fa-regular fa-copy"></i> Copy Link
+        </button>
+        <a id="modalWhatsAppShareLink" href="#" target="_blank" class="modal-btn btn-whatsapp">
+          <i class="fa-brands fa-whatsapp"></i> Send on WhatsApp
+        </a>
+      </div>
+
+      <button type="button" class="modal-btn btn-secondary" onclick="closeShareModal()"
+        style="width: 100%; margin-top: 10px;">
+        Done / Create Another
+      </button>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MODAL 2: EDIT GUEST NAME MODAL
+       ========================================================================= -->
+  <div class="modal-backdrop" id="editModal">
+    <div class="modal-card">
+      <h3 class="modal-title">Edit Guest Name</h3>
+      <p class="modal-subtitle">Update the name displayed on this invitation card.</p>
+
+      <input type="hidden" id="editCodeHidden">
+      <input type="text" id="editNameInput" class="guest-input" maxlength="100" style="margin-bottom: 18px;">
+
+      <div class="modal-btn-row">
+        <button type="button" class="modal-btn btn-gold" onclick="saveEditName()">Save Changes</button>
+        <button type="button" class="modal-btn btn-secondary" onclick="closeEditModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MODAL 3: FIREBASE SETTINGS MODAL
+       ========================================================================= -->
+  <div class="modal-backdrop" id="settingsModal">
+    <div class="modal-card" style="text-align: left; max-width: 540px;">
+      <h3 class="modal-title" style="text-align: center;">Settings &amp; Database</h3>
+      <p class="modal-subtitle" style="text-align: center;">Configure your Firestore credentials or custom invitation
+        domain.</p>
+
+      <div class="input-group">
+        <label class="input-label-row">Custom Invitation Domain / Base URL</label>
+        <input type="text" id="settingBaseUrl" class="guest-input" placeholder="e.g. https://mywedding.com"
+          style="font-size: 0.95rem;">
+        <span style="font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; display: block;">Leave empty to
+          auto-detect your current domain / hosting URL.</span>
+      </div>
+
+      <div class="input-group">
+        <label class="input-label-row">Firebase Project ID</label>
+        <input type="text" id="settingProjectId" class="guest-input" placeholder="e.g. sp-wedding-invitation"
+          style="font-size: 0.95rem;">
+      </div>
+
+      <div class="input-group">
+        <label class="input-label-row">Firebase API Key</label>
+        <input type="password" id="settingApiKey" class="guest-input" placeholder="AIzaSy..."
+          style="font-size: 0.95rem;">
+      </div>
+
+      <div class="modal-btn-row" style="margin-top: 18px;">
+        <button type="button" class="modal-btn btn-gold" onclick="saveSettings()">Save Settings</button>
+        <button type="button" class="modal-btn btn-secondary" onclick="closeSettingsModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast-msg" id="toastMsg">
+    <i class="fa-solid fa-circle-check"></i> <span id="toastText">Link copied to clipboard!</span>
+  </div>
+
+  <!-- =========================================================================
+       CORE LOGIC: FIRESTORE & LOCAL SYNC
+       ========================================================================= -->
+  <script>
+    // In-memory array of invitations
+    let invitations = [];
+    let db = null;
+    let isUsingFirestore = false;
+
+    // Load saved settings
+    const savedDomain = localStorage.getItem('sp_invite_base_url') || '';
+    const savedProjectId = localStorage.getItem('sp_firebase_project_id') || '';
+    const savedApiKey = localStorage.getItem('sp_firebase_api_key') || '';
+
+    // Initialize Database
+    function initDatabase() {
+      const statusDot = document.getElementById('statusDot');
+      const statusText = document.getElementById('statusText');
+
+      try {
+        // Merge settings from localStorage or firebase-config.js
+        const config = window.FIREBASE_CONFIG || {};
+        if (savedProjectId) config.projectId = savedProjectId;
+        if (savedApiKey) config.apiKey = savedApiKey;
+
+        const isConfigured = config.apiKey && config.apiKey !== "YOUR_API_KEY_HERE" && config.projectId !== "YOUR_PROJECT_ID";
+
+        if (isConfigured && typeof firebase !== 'undefined') {
+          if (!firebase.apps.length) {
+            firebase.initializeApp(config);
+          }
+          db = firebase.firestore();
+          isUsingFirestore = true;
+
+          statusDot.className = 'status-dot connected';
+          statusText.textContent = `Cloud Database Connected (${config.projectId})`;
+
+          // Real-time Firestore sync
+          listenToFirestore();
+          return;
+        }
+      } catch (err) {
+        console.warn("Firestore init exception:", err);
+      }
+
+      // Fallback: LocalStorage Demo Mode
+      statusDot.className = 'status-dot local';
+      statusText.innerHTML = `Offline / Demo Mode <span style="font-weight:400; opacity:0.8;">(Local Storage active. Add Firebase credentials anytime in Settings)</span>`;
+      loadFromLocalStorage();
+    }
+
+    // Realtime Firestore Listener
+    function listenToFirestore() {
+      if (!db) return;
+      db.collection('invitations').orderBy('createdAt', 'desc')
+        .onSnapshot((snapshot) => {
+          invitations = [];
+          snapshot.forEach(doc => {
+            const data = doc.data();
+            invitations.push({
+              code: doc.id,
+              guestName: data.guestName || '',
+              createdAt: data.createdAt ? (data.createdAt.toDate ? data.createdAt.toDate().toISOString() : data.createdAt) : new Date().toISOString(),
+              viewCount: data.viewCount || 0
+            });
+          });
+          // Also mirror to localStorage
+          localStorage.setItem('sp_wedding_invitations', JSON.stringify(invitations));
+          renderList();
+          updateMetrics();
+        }, (err) => {
+          console.error("Firestore listener error:", err);
+          loadFromLocalStorage();
+        });
+    }
+
+    // LocalStorage Fallback
+    function loadFromLocalStorage() {
+      const data = localStorage.getItem('sp_wedding_invitations');
+      if (data) {
+        try {
+          invitations = JSON.parse(data);
+        } catch (e) {
+          invitations = [];
+        }
+      } else {
+        // Sample starter record
+        invitations = [
+          {
+            code: 'at79hag6',
+            guestName: 'Manjunatha Udupa and Family, Bengaluru.',
+            createdAt: new Date().toISOString(),
+            viewCount: 1
+          }
+        ];
+        saveToLocalStorage();
+      }
+      renderList();
+      updateMetrics();
+    }
+
+    function saveToLocalStorage() {
+      localStorage.setItem('sp_wedding_invitations', JSON.stringify(invitations));
+    }
+
+    // Generate 8-digit unique alphanumeric code (e.g. at79hag6)
+    function generateUniqueCode() {
+      const chars = 'abcdefghjkmnpqrstuvwxyz23456789'; // human-friendly, no confusing 0/O, 1/l
+      let code = '';
+      for (let i = 0; i < 8; i++) {
+        code += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      // Check collision
+      if (invitations.some(item => item.code === code)) {
+        return generateUniqueCode();
+      }
+      return code;
+    }
+
+    // Get Base Invitation URL
+    function getBaseInvitationUrl() {
+      const customDomain = localStorage.getItem('sp_invite_base_url');
+      if (customDomain && customDomain.trim()) {
+        let base = customDomain.trim().replace(/\/+$/, '');
+        return `${base}/index.html`;
+      }
+      // Auto-detect current URL
+      const currentLoc = window.location.href.split('?')[0].split('#')[0];
+      const dirUrl = currentLoc.substring(0, currentLoc.lastIndexOf('/'));
+      return `${dirUrl}/index.html`;
+    }
+
+    function getInvitationShareUrl(code) {
+      const baseUrl = getBaseInvitationUrl();
+      return `${baseUrl}?to=${code}`;
+    }
+
+    // Live Input Handler
+    function handleInputLive(val) {
+      const charCount = document.getElementById('charCount');
+      const livePreview = document.getElementById('livePreviewDisplay');
+      charCount.textContent = `${val.length} / 100`;
+      if (val.length >= 95) {
+        charCount.classList.add('limit');
+      } else {
+        charCount.classList.remove('limit');
+      }
+
+      livePreview.textContent = val.trim() ? val : "Manjunatha Udupa and Family, Bengaluru.";
+    }
+
+    function appendTag(tagText) {
+      const input = document.getElementById('guestNameInput');
+      if (input.value.length + tagText.length <= 100) {
+        input.value += tagText;
+        handleInputLive(input.value);
+        input.focus();
+      }
+    }
+
+    // Handle Generation
+    async function handleGenerate(e) {
+      e.preventDefault();
+      const input = document.getElementById('guestNameInput');
+      const guestName = input.value.trim();
+      if (!guestName) return;
+
+      const code = generateUniqueCode();
+      const newRecord = {
+        code: code,
+        guestName: guestName,
+        createdAt: new Date().toISOString(),
+        viewCount: 0
+      };
+
+      const submitBtn = document.getElementById('generateSubmitBtn');
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving to Database...';
+
+      try {
+        if (isUsingFirestore && db) {
+          await db.collection('invitations').doc(code).set({
+            guestName: guestName,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            viewCount: 0,
+            status: 'active'
+          });
+        } else {
+          invitations.unshift(newRecord);
+          saveToLocalStorage();
+          renderList();
+          updateMetrics();
+        }
+
+        // Reset input form
+        input.value = '';
+        handleInputLive('');
+
+        if (typeof window.gtag === 'function') {
+          window.gtag('event', 'generate_invitation', { guest_name: guestName });
+        }
+
+        // Open Share Popup
+        openShareModal(code, guestName);
+      } catch (err) {
+        console.error("Save error:", err);
+        alert("Could not save to Firestore: " + err.message + ". Saved locally as fallback.");
+        invitations.unshift(newRecord);
+        saveToLocalStorage();
+        renderList();
+        updateMetrics();
+        openShareModal(code, guestName);
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fa-solid fa-link"></i> Generate 8-Digit Unique Link';
+      }
+    }
+
+    // Open Share Modal
+    function openShareModal(code, guestName) {
+      const modal = document.getElementById('shareModal');
+      const guestEl = document.getElementById('modalGuestName');
+      const codeBadge = document.getElementById('modalCodeBadge');
+      const linkText = document.getElementById('modalShareUrlText');
+      const whatsappBtn = document.getElementById('modalWhatsAppShareLink');
+
+      const fullUrl = getInvitationShareUrl(code);
+
+      guestEl.textContent = guestName;
+      codeBadge.textContent = code;
+      linkText.textContent = fullUrl;
+
+      // Personalized WhatsApp message
+      const whatsappMsg = encodeURIComponent(
+        `॥ ಶ್ರೀ ಗಣೇಶಾಯ ನಮಃ ॥\n\n` +
+        `Dear ${guestName},\n\n` +
+        `With the divine blessings of Lord Ganesha and our elders, we cordially invite you and your family to celebrate the wedding ceremony of our beloved sister:\n\n` +
+        `💍 *SRIRAKSHA K R*\n` +
+        `with\n` +
+        `💐 *PANNAGA V BHAT*\n\n` +
+        `🗓 *Date:* Sunday, 6th December 2026 at 8:35 AM (Dhanur Lagna)\n` +
+        `📍 *Venue:* Gayathri Mandira, Thirthahalli\n\n` +
+        `Please open your personalized digital invitation here:\n` +
+        `${fullUrl}\n\n` +
+        `We seek your gracious presence, prayers, and blessings!\n` +
+        `— Warmly, The Families of Sriraksha & Pannaga`
+      );
+
+      whatsappBtn.href = `https://api.whatsapp.com/send?text=${whatsappMsg}`;
+
+      modal.classList.add('open');
+    }
+
+    function closeShareModal() {
+      document.getElementById('shareModal').classList.remove('open');
+    }
+
+    // Copy Link from Modal
+    function copyModalLink() {
+      const linkText = document.getElementById('modalShareUrlText').textContent;
+      navigator.clipboard.writeText(linkText).then(() => {
+        showToast("Link copied to clipboard!");
+        const icon = document.getElementById('modalCopyIcon');
+        icon.className = 'fa-solid fa-check';
+        setTimeout(() => icon.className = 'fa-regular fa-copy', 2000);
+      }).catch(() => {
+        prompt("Copy this link:", linkText);
+      });
+    }
+
+    // Quick Copy from list
+    function copyItemLink(code) {
+      const fullUrl = getInvitationShareUrl(code);
+      navigator.clipboard.writeText(fullUrl).then(() => {
+        showToast("Personalized link copied!");
+      }).catch(() => {
+        prompt("Copy this link:", fullUrl);
+      });
+    }
+
+    // Quick Share WhatsApp from list
+    function shareItemWhatsApp(code, guestName) {
+      const fullUrl = getInvitationShareUrl(code);
+      const whatsappMsg = encodeURIComponent(
+        `॥ ಶ್ರೀ ಗಣೇಶಾಯ ನಮಃ ॥\n\n` +
+        `Dear ${guestName},\n\n` +
+        `You are cordially invited to celebrate the wedding of Sriraksha K R & Pannaga V Bhat!\n\n` +
+        `Please view your personalized digital invitation here:\n${fullUrl}\n\n` +
+        `🗓 Sunday, 6th Dec 2026, 8:35 AM\n` +
+        `📍 Gayathri Mandira, Thirthahalli.`
+      );
+      window.open(`https://api.whatsapp.com/send?text=${whatsappMsg}`, '_blank');
+    }
+
+    // Search Handler
+    function handleSearch(query) {
+      renderList(query);
+    }
+
+    // Render List
+    function renderList(searchQuery = '') {
+      const listEl = document.getElementById('invitationsList');
+      const q = searchQuery.toLowerCase().trim();
+
+      const filtered = invitations.filter(item => {
+        if (!q) return true;
+        return (item.guestName && item.guestName.toLowerCase().includes(q)) ||
+               (item.code && item.code.toLowerCase().includes(q));
+      });
+
+      if (filtered.length === 0) {
+        listEl.innerHTML = `
+          <div class="empty-state">
+            <i class="fa-regular fa-folder-open"></i>
+            <h3>No invitations found</h3>
+            <p>${q ? 'No records match your search query.' : 'Generate your first personalized invitation above!'}</p>
+          </div>
+        `;
+        return;
+      }
+
+      listEl.innerHTML = filtered.map(item => {
+        const fullUrl = getInvitationShareUrl(item.code);
+        const formattedDate = new Date(item.createdAt).toLocaleDateString('en-IN', {
+          day: 'numeric',
+          month: 'short',
+          year: 'numeric'
+        });
+
+        const views = item.viewCount || 0;
+        const viewBadge = views > 0 
+          ? `<span class="view-count-badge"><i class="fa-solid fa-eye"></i> ${views} ${views === 1 ? 'view' : 'views'}</span>`
+          : `<span class="view-count-badge unopened"><i class="fa-regular fa-clock"></i> Not opened yet</span>`;
+
+        return `
+          <div class="invitation-item-card">
+            <div class="item-info-col">
+              <div class="item-name-title">${escapeHtml(item.guestName)}</div>
+              <div class="item-meta-row">
+                <span class="code-badge" title="Unique Code">${item.code}</span>
+                <span><i class="fa-regular fa-calendar"></i> ${formattedDate}</span>
+                ${viewBadge}
+              </div>
+            </div>
+
+            <div class="item-actions-col">
+              <button type="button" class="action-icon-btn" onclick="copyItemLink('${item.code}')" title="Copy Link">
+                <i class="fa-regular fa-copy"></i>
+              </button>
+              <button type="button" class="action-icon-btn whatsapp-btn" onclick="shareItemWhatsApp('${item.code}', '${escapeJs(item.guestName)}')" title="Share on WhatsApp">
+                <i class="fa-brands fa-whatsapp"></i>
+              </button>
+              <a href="${fullUrl}" target="_blank" class="action-icon-btn" title="Preview Invitation">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+              </a>
+              <button type="button" class="action-icon-btn" onclick="openEditModal('${item.code}', '${escapeJs(item.guestName)}')" title="Edit Name">
+                <i class="fa-regular fa-pen-to-square"></i>
+              </button>
+              <button type="button" class="action-icon-btn delete-btn" onclick="deleteInvitation('${item.code}')" title="Delete">
+                <i class="fa-regular fa-trash-can"></i>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Update Metrics
+    function updateMetrics() {
+      const total = invitations.length;
+      const totalViews = invitations.reduce((sum, item) => sum + (item.viewCount || 0), 0);
+      const openedCount = invitations.filter(item => (item.viewCount || 0) > 0).length;
+      const engagement = total > 0 ? Math.round((openedCount / total) * 100) : 0;
+
+      document.getElementById('totalCountDisplay').textContent = total;
+      document.getElementById('totalViewsDisplay').textContent = totalViews;
+      document.getElementById('activeRateDisplay').textContent = `${engagement}%`;
+    }
+
+    // Edit Name Modal
+    function openEditModal(code, currentName) {
+      document.getElementById('editCodeHidden').value = code;
+      document.getElementById('editNameInput').value = currentName;
+      document.getElementById('editModal').classList.add('open');
+    }
+
+    function closeEditModal() {
+      document.getElementById('editModal').classList.remove('open');
+    }
+
+    async function saveEditName() {
+      const code = document.getElementById('editCodeHidden').value;
+      const newName = document.getElementById('editNameInput').value.trim();
+      if (!newName) return;
+
+      if (isUsingFirestore && db) {
+        try {
+          await db.collection('invitations').doc(code).update({
+            guestName: newName
+          });
+        } catch (e) {
+          console.error("Update error:", e);
+        }
+      }
+
+      const item = invitations.find(i => i.code === code);
+      if (item) {
+        item.guestName = newName;
+        saveToLocalStorage();
+        renderList(document.getElementById('searchInput').value);
+      }
+
+      closeEditModal();
+      showToast("Guest name updated!");
+    }
+
+    // Delete Invitation
+    async function deleteInvitation(code) {
+      if (!confirm("Are you sure you want to delete this invitation link?")) return;
+
+      if (isUsingFirestore && db) {
+        try {
+          await db.collection('invitations').doc(code).delete();
+        } catch (e) {
+          console.error("Delete error:", e);
+        }
+      }
+
+      invitations = invitations.filter(i => i.code !== code);
+      saveToLocalStorage();
+      renderList(document.getElementById('searchInput').value);
+      updateMetrics();
+      showToast("Invitation removed.");
+    }
+
+    // Export to CSV
+    function exportToCSV() {
+      if (invitations.length === 0) {
+        alert("No invitations to export!");
+        return;
+      }
+
+      let csv = "Code,Guest Name,Created Date,View Count,Invitation Link\n";
+      invitations.forEach(item => {
+        const link = getInvitationShareUrl(item.code);
+        const nameEscaped = `"${(item.guestName || '').replace(/"/g, '""')}"`;
+        const date = new Date(item.createdAt).toISOString();
+        csv += `${item.code},${nameEscaped},${date},${item.viewCount || 0},${link}\n`;
+      });
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Sriraksha_Pannaga_Invitations_${new Date().toISOString().slice(0, 10)}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast("Exported to CSV!");
+    }
+
+    // Settings Modal
+    function openSettingsModal() {
+      document.getElementById('settingBaseUrl').value = localStorage.getItem('sp_invite_base_url') || '';
+      document.getElementById('settingProjectId').value = localStorage.getItem('sp_firebase_project_id') || (window.FIREBASE_CONFIG ? window.FIREBASE_CONFIG.projectId : '');
+      document.getElementById('settingApiKey').value = localStorage.getItem('sp_firebase_api_key') || (window.FIREBASE_CONFIG ? window.FIREBASE_CONFIG.apiKey : '');
+      document.getElementById('settingsModal').classList.add('open');
+    }
+
+    function closeSettingsModal() {
+      document.getElementById('settingsModal').classList.remove('open');
+    }
+
+    function saveSettings() {
+      const base = document.getElementById('settingBaseUrl').value.trim();
+      const proj = document.getElementById('settingProjectId').value.trim();
+      const key = document.getElementById('settingApiKey').value.trim();
+
+      if (base) localStorage.setItem('sp_invite_base_url', base);
+      else localStorage.removeItem('sp_invite_base_url');
+
+      if (proj) localStorage.setItem('sp_firebase_project_id', proj);
+      if (key) localStorage.setItem('sp_firebase_api_key', key);
+
+      closeSettingsModal();
+      showToast("Settings saved! Reloading...");
+      setTimeout(() => window.location.reload(), 1000);
+    }
+
+    // Toast
+    function showToast(msg) {
+      const toast = document.getElementById('toastMsg');
+      document.getElementById('toastText').textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    // Helpers
+    function escapeHtml(text) {
+      const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+      return String(text || '').replace(/[&<>"']/g, m => map[m]);
+    }
+
+    function escapeJs(text) {
+      return String(text || '').replace(/'/g, "\\'").replace(/"/g, '\\"');
+    }
+
+    // Start
+    initDatabase();
+  </script>
+</body>
+
+</html>
+
