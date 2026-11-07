@@ -1350,9 +1350,10 @@ body.lang-kn .venue-name-title {
 /* Venue Architectural Photograph Showcase */
 .venue-photo-card {
   position: relative;
+  z-index: 5;
   width: 100%;
   max-width: 400px;
-  margin: 6px auto 24px;
+  margin: 6px auto 0;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -1431,21 +1432,22 @@ body.lang-kn .venue-name-title {
 }
 
 /* ==========================================================================
-   UNIFIED VENUE LIVE MAP & RIGHT-ALIGNED QR NAVIGATION STAGE
+   UNIFIED VENUE LIVE MAP NAVIGATION STAGE
    ========================================================================== */
 .venue-navigation-stage {
   position: relative;
   width: 100%;
-  border-radius: 18px;
+  border-radius: 20px;
   overflow: hidden;
-  border: 1.5px solid rgba(229, 195, 120, 0.35);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.55), 0 0 20px rgba(229, 195, 120, 0.15);
+  border: none;
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.65);
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: flex-end; /* Moves QR cluster to the right */
-  min-height: 290px;
-  margin: 10px auto 0;
-  background: #E5E3DF; /* Native light Google Maps tone */
+  justify-content: flex-end; /* Places button at the bottom center */
+  min-height: 280px;
+  margin: -24px auto 0; /* Flows seamlessly right up under the photo */
+  background: #18191E; /* Midnight Night Tone */
 }
 
 .venue-map-background {
@@ -1456,16 +1458,74 @@ body.lang-kn .venue-name-title {
   height: 100%;
   z-index: 1;
   overflow: hidden;
+  border-radius: 20px;
+  /* Organic vertical blend: softly fades in at the top where the photo sits and at the bottom */
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(0, 0, 0, 0.2) 6%,
+    rgba(0, 0, 0, 0.8) 16%,
+    black 26%,
+    black 82%,
+    rgba(0, 0, 0, 0.75) 92%,
+    rgba(0, 0, 0, 0.2) 97%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(0, 0, 0, 0.2) 6%,
+    rgba(0, 0, 0, 0.8) 16%,
+    black 26%,
+    black 82%,
+    rgba(0, 0, 0, 0.75) 92%,
+    rgba(0, 0, 0, 0.2) 97%,
+    transparent 100%
+  );
 }
 
-/* Light Theme Google Map - Offset so Gayathri Mandira Pin is Centered in the Open Left Area */
+/* Night / Midnight Theme Google Map - Full Width & Centered on Gayathri Mandira */
 .venue-map-iframe {
   position: absolute;
   top: 0;
-  right: 0;
-  width: 152%;
+  left: 0;
+  width: 100%;
   height: 100%;
   border: 0;
+  filter: invert(90%) hue-rotate(180deg) contrast(1.12) brightness(0.88);
+}
+
+/* Soft Atmospheric Top and Bottom Blends (Seamless merge with photo & card background) */
+.venue-map-top-blend {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 65px;
+  background: linear-gradient(
+    to bottom,
+    var(--content-bg-dark) 0%,
+    rgba(26, 4, 11, 0.75) 40%,
+    transparent 100%
+  );
+  pointer-events: none;
+  z-index: 2;
+}
+
+.venue-map-bottom-blend {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 45px;
+  background: linear-gradient(
+    to top,
+    var(--content-bg-dark) 0%,
+    rgba(26, 4, 11, 0.75) 40%,
+    transparent 100%
+  );
+  pointer-events: none;
+  z-index: 2;
 }
 
 .venue-map-gradient-overlay {
@@ -1507,127 +1567,48 @@ body.lang-kn .venue-name-title {
   transform: translateY(-1.5px);
 }
 
-/* Right-Aligned QR Cluster (Transparent Tray - Light Map Flows Underneath) */
-.venue-qr-right-cluster {
+/* Centered Map Action Cluster (Floating Gold Locate on Maps Button) */
+.venue-map-action-cluster {
   position: relative;
-  z-index: 3;
+  z-index: 4;
+  margin-bottom: 16px;
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  padding: 14px 16px;
-  margin-left: auto; /* Aligns to right */
-  width: auto;
-  max-width: 240px;
-  background: transparent;
-  border: none;
-  box-shadow: none;
-}
-
-/* Thematic Royal Gold & Cream Venue QR Code (100% Scannable) */
-.thematic-qr-link {
-  display: inline-block;
-  text-decoration: none;
-  cursor: pointer;
-  outline: none;
-  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-
-.thematic-qr-link:hover {
-  transform: translateY(-2px) scale(1.03);
-}
-
-.thematic-qr-wrapper {
-  display: inline-flex;
-  align-items: center;
   justify-content: center;
-  padding: 0;
-  border-radius: 16px;
-  background: transparent;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45), 0 0 12px rgba(229, 195, 120, 0.35);
-  transition: box-shadow 0.3s ease;
+  align-items: center;
 }
 
-.thematic-qr-link:hover .thematic-qr-wrapper {
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6), 0 0 20px rgba(229, 195, 120, 0.5);
-}
-
-.thematic-qr-svg {
-  display: block;
-  width: 135px;
-  height: 135px;
-  border-radius: 16px;
-  object-fit: contain;
-}
-
-.venue-qr-right-cluster .qr-instruction {
-  font-family: var(--font-sans);
-  font-size: 0.72rem;
-  line-height: 1.35;
-  margin: 0;
-  text-align: center;
-  color: #FFF0BD;
-  background: rgba(26, 4, 11, 0.85);
-  padding: 4px 10px;
-  border-radius: 12px;
-  border: 1px solid rgba(229, 195, 120, 0.35);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.4);
-}
-
-.venue-qr-right-cluster .map-link-btn {
+.map-link-btn {
   background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark));
   color: #21040D;
   text-decoration: none;
   font-family: var(--font-sans);
-  font-size: 0.82rem;
+  font-size: 0.88rem;
   font-weight: 700;
-  padding: 8px 16px;
+  padding: 10px 22px;
   border-radius: 24px;
   display: inline-flex;
   align-items: center;
-  gap: 7px;
+  gap: 8px;
   white-space: nowrap;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5), 0 0 12px rgba(229, 195, 120, 0.28);
   transition: all 0.25s ease;
 }
 
-.venue-qr-right-cluster .map-link-btn:hover {
+.map-link-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px var(--gold-glow);
+  box-shadow: 0 6px 22px var(--gold-glow);
   color: #000;
 }
 
 @media (max-width: 480px) {
   .venue-navigation-stage {
-    min-height: 260px;
+    min-height: 250px;
+    margin: -18px auto 0;
   }
 
-  .venue-map-iframe {
-    width: 160%;
-  }
-
-  .venue-qr-right-cluster {
-    max-width: 180px;
-    padding: 10px 8px;
-    gap: 7px;
-  }
-
-  .thematic-qr-svg {
-    width: 110px;
-    height: 110px;
-  }
-
-  .venue-qr-right-cluster .qr-instruction {
-    font-size: 0.68rem;
-    padding: 3px 8px;
-  }
-
-  .venue-qr-right-cluster .map-link-btn {
-    font-size: 0.74rem;
-    padding: 6px 10px;
-    gap: 5px;
+  .map-link-btn {
+    font-size: 0.82rem;
+    padding: 8px 18px;
   }
 }
 
