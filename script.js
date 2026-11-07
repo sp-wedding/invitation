@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
       venueLabel: "Venue:",
       venueName: "Gayathri Mandira, Thirthahalli.",
       scanForLocation: "Scan QR code or click below to navigate",
-      openInMapsBtn: "Get Directions on Google Maps",
+      openInMapsBtn: "Locate on Google Maps",
 
       // Spotlight & Gallery
       coupleStoryTitle: "A Journey of Love & Tradition",

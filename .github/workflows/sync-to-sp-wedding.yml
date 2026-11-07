@@ -21,3 +21,4 @@ jobs:
           SYNC_TOKEN: ${{ secrets.SP_WEDDING_SYNC_TOKEN }}
         run: |
           git push --force https://x-access-token:${{ secrets.SP_WEDDING_SYNC_TOKEN }}@github.com/sp-wedding/invitation.git main:main
+
