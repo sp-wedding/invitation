@@ -16,12 +16,14 @@
   <title>Wedding Invitation | Sriraksha &amp; Pannaga</title>
   <link rel="icon" type="image/svg+xml" href="assets/ganesha-gold.svg">
 
-  <meta http-equiv="refresh" content="0; url=send.html">
+  <meta http-equiv="refresh" content="0; url=send">
   <script>
     // Seamless redirect preserving all query parameters (e.g. ?to=at79hag6) and hash
     const query = window.location.search || '';
     const hash = window.location.hash || '';
-    window.location.replace('send.html' + query + hash);
+    const isFile = window.location.protocol === 'file:';
+    const target = (isFile ? 'send.html' : 'send') + query + hash;
+    window.location.replace(target);
   </script>
 </head>
 

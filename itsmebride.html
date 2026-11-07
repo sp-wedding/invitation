@@ -834,7 +834,7 @@
         <span id="statusText">Checking database connection...</span>
       </div>
       <div style="display: flex; gap: 8px;">
-        <a href="send.html?to=at79hag6" target="_blank" id="viewInvitationLinkTop" class="settings-btn" title="Open Invitation Card">
+        <a href="send?to=at79hag6" target="_blank" id="viewInvitationLinkTop" class="settings-btn" title="Open Invitation Card">
           <i class="fa-solid fa-arrow-up-right-from-square"></i> View Invitation
         </a>
         <button class="settings-btn" onclick="openSettingsModal()">
@@ -947,10 +947,10 @@
 
       <div class="input-group">
         <label class="input-label-row">Custom Invitation Domain / Base URL</label>
-        <input type="text" id="settingBaseUrl" class="guest-input" placeholder="e.g. https://mywedding.com"
+        <input type="text" id="settingBaseUrl" class="guest-input" placeholder="e.g. https://domain.com"
           style="font-size: 0.95rem;">
         <span style="font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; display: block;">Leave empty to
-          auto-detect your current domain / hosting URL.</span>
+          auto-detect your hosting domain (generates links as <code>https://domain.com/send?to=code</code>).</span>
       </div>
 
       <div class="input-group">
@@ -1096,20 +1096,21 @@
       return code;
     }
 
-    // Get Base Invitation URL
+    // Get Base Invitation URL (Outputs clean short link like https://domain.com/send)
     function getBaseInvitationUrl() {
       const customDomain = localStorage.getItem('sp_invite_base_url');
       if (customDomain && customDomain.trim()) {
         let base = customDomain.trim().replace(/\/+$/, '');
-        if (base.endsWith('.html') || base.endsWith('/send')) {
-          return base;
-        }
-        return `${base}/send.html`;
+        base = base.replace(/\/send(?:\.html)?$/i, '');
+        return `${base}/send`;
       }
       // Auto-detect current URL
       const currentLoc = window.location.href.split('?')[0].split('#')[0];
       const dirUrl = currentLoc.substring(0, currentLoc.lastIndexOf('/'));
-      return `${dirUrl}/send.html`;
+      if (window.location.protocol === 'file:') {
+        return `${dirUrl}/send.html`;
+      }
+      return `${dirUrl}/send`;
     }
 
     function getInvitationShareUrl(code) {

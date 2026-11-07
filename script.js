@@ -7,6 +7,12 @@
 
 document.addEventListener('DOMContentLoaded', () => {
 
+  // Normalize address bar URL to clean /send?to=... format (without .html)
+  if (window.location.protocol !== 'file:' && window.location.pathname.endsWith('/send.html')) {
+    const cleanPath = window.location.pathname.replace(/\/send\.html$/, '/send');
+    window.history.replaceState({}, '', cleanPath + window.location.search + window.location.hash);
+  }
+
   // =========================================================================
   // GOOGLE ANALYTICS EVENT TRACKING HELPER
   // =========================================================================

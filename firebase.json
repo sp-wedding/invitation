@@ -1,0 +1,21 @@
+{
+  "hosting": {
+    "public": ".",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "cleanUrls": true,
+    "rewrites": [
+      {
+        "source": "/send",
+        "destination": "/send.html"
+      },
+      {
+        "source": "/send/**",
+        "destination": "/send.html"
+      }
+    ]
+  }
+}
