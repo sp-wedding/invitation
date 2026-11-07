@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
       introBrideName: "SRIRAKSHA K R",
       introGroomName: "PANNAGA V BHAT",
       toLabel: "TO",
-      defaultGuest: "Manjunatha Udupa and Family,\nBengaluru.",
+      defaultGuest: "Writing your name digitally..\nplease wait..",
       revealTimer: "Revealing invitation in",
       seconds: "s",
       openNowBtn: "Open Invitation",
@@ -82,7 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
       introBrideName: "ಶ್ರೀರಕ್ಷಾ ಕೆ.ಆರ್",
       introGroomName: "ಪನ್ನಗ ವಿ. ಭಟ್",
       toLabel: "ಇವರಿಗೆ",
-      defaultGuest: "ಮಂಜುನಾಥ ಉಡುಪ ಮತ್ತು ಕುಟುಂಬ,\nಬೆಂಗಳೂರು.",
+      defaultGuest: "ನಿಮ್ಮ ಹೆಸರನ್ನು ಬರೆಯಲಾಗುತ್ತಿದೆ..\nದಯವಿಟ್ಟು ನಿರೀಕ್ಷಿಸಿ..",
       revealTimer: "ಆಮಂತ್ರಣ ತೆರೆಯಲಾಗುತ್ತಿದೆ ಇನ್ನೇನು",
       seconds: "ಸೆಕೆಂಡ್",
       openNowBtn: "ಆಮಂತ್ರಣ ಪತ್ರಿಕೆ ತೆರೆಯಿರಿ",
@@ -230,93 +230,192 @@ document.addEventListener('DOMContentLoaded', () => {
   const saveGuestBtn = document.getElementById('saveGuestEditBtn');
   const cancelGuestBtn = document.getElementById('cancelGuestEditBtn');
 
-  // Check URL query parameters or Firestore code (e.g., ?to=at79hag6 or ?to=Manjunatha+Udupa...)
-  async function parseUrlGuest() {
+    // =========================================================================
+  // GATEKEEPER / VERIFIER LOADING & CODE RESOLUTION LOGIC
+  // =========================================================================
+  const verifierScreen = document.getElementById('verifierScreen');
+  const verifierLoadingState = document.getElementById('verifierLoadingState');
+  const verifierErrorState = document.getElementById('verifierErrorState');
+  const verifierErrorDesc = document.getElementById('verifierErrorDesc');
+  const verifierCodeTriedBox = document.getElementById('verifierCodeTriedBox');
+  const verifierCodeTried = document.getElementById('verifierCodeTried');
+  const verifierStatusText = document.getElementById('verifierStatusText');
+
+  function showVerifierError(message, attemptedCode = null) {
+    document.body.style.overflow = 'hidden';
+    if (verifierLoadingState) verifierLoadingState.style.display = 'none';
+    if (verifierErrorState) verifierErrorState.style.display = 'block';
+    if (verifierErrorDesc && message) {
+      verifierErrorDesc.innerHTML = message;
+    }
+    if (verifierCodeTriedBox && verifierCodeTried) {
+      if (attemptedCode) {
+        verifierCodeTried.textContent = attemptedCode;
+        verifierCodeTriedBox.style.display = 'inline-block';
+      } else {
+        verifierCodeTriedBox.style.display = 'none';
+      }
+    }
+  }
+
+  async function initVerifierAndLoad() {
+    // Lock body scroll while on verifier gatekeeper screen
+    document.body.style.overflow = 'hidden';
+
+    // 1. Extract alphanumeric code from query parameters or pathname
     const params = new URLSearchParams(window.location.search);
-    let toParam = params.get('to') || params.get('name') || params.get('guest') || params.get('code') || params.get('id');
+    let rawCode = params.get('to') || params.get('code') || params.get('id') || params.get('pass') || params.get('key');
 
     // Also check pathname (e.g. /invitation/at79hag6 or /at79hag6)
-    if (!toParam) {
-      const pathMatch = window.location.pathname.match(/\/(?:invitation\/)?([a-zA-Z0-9]{8})\/?$/);
+    if (!rawCode) {
+      const pathMatch = window.location.pathname.match(/\/(?:invitation\/)?([a-zA-Z0-9]{4,24})\/?$/);
       if (pathMatch) {
-        toParam = pathMatch[1];
+        rawCode = pathMatch[1];
       }
     }
 
-    if (!toParam || !guestDisplay) return;
+    // 2. CHECK 1: Does the link include a code? (Disallow bare links like ending with only index.html)
+    if (!rawCode || !rawCode.trim()) {
+      showVerifierError(
+        "The link might be broken or unable to fetch the e-invitation.<br><br>Personalized wedding invitations require a valid passkey from Sriraksha &amp; Pannaga's guest registry. Links without an invitation code cannot be accessed.",
+        null
+      );
+      trackEvent('invitation_missing_code');
+      return;
+    }
 
-    // Check if toParam looks like an 8-character unique alphanumeric code
-    const isCodePattern = /^[a-zA-Z0-9]{8}$/.test(toParam.trim());
+    const code = rawCode.trim();
 
-    if (isCodePattern) {
-      const code = toParam.trim();
-      let resolvedName = null;
+    // 3. CHECK 2: Is it a valid alphanumeric code?
+    const isAlphanumeric = /^[a-zA-Z0-9]{4,24}$/.test(code);
+    if (!isAlphanumeric) {
+      showVerifierError(
+        "The link might be broken or unable to fetch the e-invitation.<br><br>The passkey in this link is not in a valid alphanumeric format.",
+        code
+      );
+      trackEvent('invitation_invalid_format', { code: code });
+      return;
+    }
 
-      // 1. Try Firestore lookup if configured
+    // 4. CHECK WITH FIREBASE FIRESTORE & LOCAL REGISTRY
+    let resolvedGuestName = null;
+    let isCloudVerified = false;
+
+    // A. Check Firestore if configured
+    try {
+      const config = window.FIREBASE_CONFIG || {};
+      const savedProjectId = localStorage.getItem('sp_firebase_project_id');
+      const savedApiKey = localStorage.getItem('sp_firebase_api_key');
+      if (savedProjectId) config.projectId = savedProjectId;
+      if (savedApiKey) config.apiKey = savedApiKey;
+
+      const isConfigured = window.isFirebaseConfigured ? window.isFirebaseConfigured() : Boolean(
+        config.apiKey &&
+        config.apiKey !== "YOUR_API_KEY_HERE" &&
+        config.projectId &&
+        config.projectId !== "YOUR_PROJECT_ID"
+      );
+
+      if (isConfigured && typeof firebase !== 'undefined') {
+        if (!firebase.apps.length) {
+          firebase.initializeApp(config);
+        }
+        const firestore = firebase.firestore();
+        const docRef = firestore.collection('invitations').doc(code);
+
+        // Safety timeout of 6 seconds to prevent hanging on spotty connections
+        const fetchPromise = docRef.get();
+        const timeoutPromise = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Firestore network timeout')), 6000)
+        );
+
+        const docSnap = await Promise.race([fetchPromise, timeoutPromise]);
+
+        if (docSnap && docSnap.exists) {
+          const data = docSnap.data();
+          if (data && data.guestName) {
+            resolvedGuestName = data.guestName;
+            isCloudVerified = true;
+            // Increment view count in Firestore
+            docRef.update({
+              viewCount: firebase.firestore.FieldValue.increment(1),
+              lastViewedAt: firebase.firestore.FieldValue.serverTimestamp()
+            }).catch(e => console.warn("View counter notice:", e));
+          }
+        }
+      }
+    } catch (err) {
+      console.warn("Firestore lookup notice:", err);
+    }
+
+    // B. Fallback to LocalStorage (for offline / bride portal demo testing)
+    if (!resolvedGuestName) {
       try {
-        const config = window.FIREBASE_CONFIG || {};
-        const savedProjectId = localStorage.getItem('sp_firebase_project_id');
-        const savedApiKey = localStorage.getItem('sp_firebase_api_key');
-        if (savedProjectId) config.projectId = savedProjectId;
-        if (savedApiKey) config.apiKey = savedApiKey;
-
-        const isConfigured = config.apiKey && config.apiKey !== "YOUR_API_KEY_HERE" && config.projectId !== "YOUR_PROJECT_ID";
-
-        if (isConfigured && typeof firebase !== 'undefined') {
-          if (!firebase.apps.length) {
-            firebase.initializeApp(config);
-          }
-          const firestore = firebase.firestore();
-          const docRef = firestore.collection('invitations').doc(code);
-          const docSnap = await docRef.get();
-
-          if (docSnap.exists) {
-            const data = docSnap.data();
-            if (data && data.guestName) {
-              resolvedName = data.guestName;
-              // Increment view count in Firestore
-              docRef.update({
-                viewCount: firebase.firestore.FieldValue.increment(1),
-                lastViewedAt: firebase.firestore.FieldValue.serverTimestamp()
-              }).catch(e => console.warn("View counter notice:", e));
-            }
+        const localData = localStorage.getItem('sp_wedding_invitations');
+        if (localData) {
+          const list = JSON.parse(localData);
+          const found = list.find(item => item.code && item.code.toLowerCase() === code.toLowerCase());
+          if (found && found.guestName) {
+            resolvedGuestName = found.guestName;
+            found.viewCount = (found.viewCount || 0) + 1;
+            localStorage.setItem('sp_wedding_invitations', JSON.stringify(list));
           }
         }
-      } catch (err) {
-        console.warn("Firestore lookup notice:", err);
-      }
-
-      // 2. Fallback to LocalStorage (for offline / demo testing)
-      if (!resolvedName) {
-        try {
-          const localData = localStorage.getItem('sp_wedding_invitations');
-          if (localData) {
-            const list = JSON.parse(localData);
-            const found = list.find(item => item.code === code);
-            if (found && found.guestName) {
-              resolvedName = found.guestName;
-              found.viewCount = (found.viewCount || 0) + 1;
-              localStorage.setItem('sp_wedding_invitations', JSON.stringify(list));
-            }
-          }
-        } catch (e) {
-          console.warn("Local storage lookup notice:", e);
-        }
-      }
-
-      // If resolved from database or local demo storage:
-      if (resolvedName) {
-        window.hasCustomGuestName = true;
-        guestDisplay.innerHTML = escapeHtml(resolvedName).replace(/,\s*/g, ',<br>');
-        if (guestInput) guestInput.value = resolvedName;
-        return;
+      } catch (e) {
+        console.warn("Local storage lookup notice:", e);
       }
     }
 
-    // Direct plain text name (e.g. ?to=Manjunatha+Udupa+and+Family)
+    // 5. EVALUATION: Did code match registered invitations?
+    if (!resolvedGuestName) {
+      showVerifierError(
+        "The link might be broken or unable to fetch the e-invitation.<br><br>The passkey was not found in Sriraksha &amp; Pannaga's guest registry.",
+        code
+      );
+      trackEvent('invitation_verify_failed', { code: code });
+      return;
+    }
+
+    // 6. SUCCESS: Personalize card, dismiss gatekeeper, start countdown & petals
     window.hasCustomGuestName = true;
-    guestDisplay.innerHTML = escapeHtml(toParam).replace(/,\s*/g, ',<br>');
-    if (guestInput) guestInput.value = toParam;
+    if (guestDisplay) {
+      guestDisplay.innerHTML = escapeHtml(resolvedGuestName).replace(/,\s*/g, ',<br>');
+    }
+    if (guestInput) {
+      guestInput.value = resolvedGuestName;
+    }
+
+    trackEvent('invitation_verified', {
+      code: code,
+      guest_name: resolvedGuestName,
+      cloud: isCloudVerified
+    });
+
+    if (verifierStatusText) {
+      verifierStatusText.textContent = "Invitation verified! Welcome...";
+    }
+
+    // Restore body scroll
+    document.body.style.overflow = '';
+
+    // Smoothly dismiss verifier screen
+    if (verifierScreen) {
+      gsap.to(verifierScreen, {
+        opacity: 0,
+        duration: 0.6,
+        delay: 0.25,
+        ease: 'power2.out',
+        onComplete: () => {
+          verifierScreen.style.display = 'none';
+          verifierScreen.classList.add('hidden');
+          startRevealCountdown();
+          smoothlyStartPetals();
+        }
+      });
+    } else {
+      startRevealCountdown();
+      smoothlyStartPetals();
+    }
   }
 
   function escapeHtml(text) {
@@ -396,8 +495,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const progressFillEl = document.getElementById('revealProgressFill');
   const openBtn = document.getElementById('openInvitationBtn');
   const introSection = document.getElementById('introSection');
+  const introCard = document.getElementById('introCard');
   const contentSection = document.getElementById('contentSection');
-  const backToCoverBtn = document.getElementById('backToCoverBtn');
   let hasRevealed = false;
 
   function triggerReveal() {
@@ -406,36 +505,39 @@ document.addEventListener('DOMContentLoaded', () => {
     trackEvent('invitation_revealed');
     if (countdownTimerInterval) clearInterval(countdownTimerInterval);
 
-    // Smoothly stop continuous rainfall effect once invitation is revealed
+    // 1. Reveal content section into document flow
+    if (contentSection) {
+      contentSection.classList.remove('content-hidden');
+    }
+    if (window.ScrollTrigger) {
+      ScrollTrigger.refresh();
+    }
+
+    // 2. Put intro card into idle state as we enter content
+    if (introCard) {
+      introCard.classList.add('is-idle');
+    }
+
+    // 3. Smoothly stop continuous rainfall effect once invitation is revealed
     smoothlyStopPetals();
 
-    // Trigger one-time celebratory flower burst
+    // 4. Trigger one-time celebratory flower burst
     burstCelebrationPetals();
 
-    // Smooth native scroll fallback in parallel with GSAP
+    // 5. Smooth scroll into the content section
     if (contentSection) {
       setTimeout(() => {
         contentSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 300);
+      }, 60);
     }
 
-    // GSAP Timeline for luxury unfolding reveal
+    // 6. GSAP Timeline for luxury unfolding reveal
     const tl = gsap.timeline();
 
-    // 1. Gently scale down intro card as if opening an envelope
-    tl.to('#introCard', {
-      scale: 0.96,
-      opacity: 0.6,
-      duration: 0.6,
-      ease: 'power2.inOut'
-    })
-      // 2. Bring content card into full brilliance
-      .fromTo('#contentCard',
-        { y: 50, opacity: 0, scale: 0.96 },
-        { y: 0, opacity: 1, scale: 1, duration: 0.8, ease: 'back.out(1.2)' },
-        "-=0.3"
-      )
-      // 3. Stagger reveal all inner elements
+    tl.fromTo('#contentCard',
+      { y: 50, opacity: 0, scale: 0.96 },
+      { y: 0, opacity: 1, scale: 1, duration: 0.8, ease: 'back.out(1.2)' }
+    )
       .fromTo('.gs-reveal',
         { y: 25, opacity: 0 },
         { y: 0, opacity: 1, duration: 0.6, stagger: 0.1, ease: 'power2.out' },
@@ -471,15 +573,48 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Return to Cover Page Button
-  if (backToCoverBtn) {
-    backToCoverBtn.addEventListener('click', () => {
-      gsap.to('#introCard', { scale: 1, opacity: 1, duration: 0.5 });
-      if (introSection) {
+  // =========================================================================
+  // SCROLL OBSERVATION: RESTORE COVER AT TOP & IDLE WHEN IN CONTENT
+  // =========================================================================
+  let isScrollDebouncing = false;
+
+  function updateCoverScrollState() {
+    if (!hasRevealed || !introSection || !introCard) return;
+
+    const introRect = introSection.getBoundingClientRect();
+    // When user scrolls back up near the top cover page:
+    const isAtTop = window.scrollY < 80 || introRect.bottom > (window.innerHeight * 0.45);
+
+    if (isAtTop) {
+      if (introCard.classList.contains('is-idle')) {
+        introCard.classList.remove('is-idle');
+        smoothlyStartPetals();
+      }
+    } else {
+      if (!introCard.classList.contains('is-idle')) {
+        introCard.classList.add('is-idle');
+        smoothlyStopPetals();
+      }
+    }
+  }
+
+  window.addEventListener('scroll', () => {
+    if (!isScrollDebouncing) {
+      window.requestAnimationFrame(() => {
+        updateCoverScrollState();
+        isScrollDebouncing = false;
+      });
+      isScrollDebouncing = true;
+    }
+  }, { passive: true });
+
+  // Clicking the idle cover card smoothly scrolls back to top
+  if (introCard) {
+    introCard.addEventListener('click', (e) => {
+      if (hasRevealed && introCard.classList.contains('is-idle')) {
+        if (e.target.closest('#editGuestBtn') || e.target.closest('.customize-btn')) return;
         introSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
-      hasRevealed = false;
-      smoothlyStartPetals();
     });
   }
 
@@ -645,15 +780,14 @@ document.addEventListener('DOMContentLoaded', () => {
   const petalsCanvas = document.getElementById('petalsCanvas');
   let petalsCtx = null;
   let petals = [];
-  let isPetalsActive = true;
+  let isPetalsActive = false;
   let petalAnimationId = null;
 
   if (petalsCanvas) {
     petalsCtx = petalsCanvas.getContext('2d');
     resizePetalsCanvas();
     window.addEventListener('resize', resizePetalsCanvas);
-    createInitialPetals();
-    animatePetals();
+    // Petals will smoothly start once invitation code is verified
   }
 
   function resizePetalsCanvas() {
@@ -861,10 +995,9 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   // =========================================================================
-  // INITIALIZATION RUN
+  // INITIALIZATION RUN (GATED BY GATEKEEPER VERIFIER)
   // =========================================================================
-  parseUrlGuest();
   updateLanguage('en');
-  startRevealCountdown();
+  initVerifierAndLoad();
 
 });

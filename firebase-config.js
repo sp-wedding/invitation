@@ -18,9 +18,12 @@ window.FIREBASE_CONFIG = {
 
 // Check if credentials have been replaced
 window.isFirebaseConfigured = function () {
-  return window.FIREBASE_CONFIG &&
+  return Boolean(
+    window.FIREBASE_CONFIG &&
     window.FIREBASE_CONFIG.apiKey &&
-    window.FIREBASE_CONFIG.apiKey !== "AIzaSyDnXcKDmcSgdHn9-yNcMhGHE05w7hOFZL8" &&
-    window.FIREBASE_CONFIG.projectId !== "sp-wedding-invitation";
+    window.FIREBASE_CONFIG.apiKey !== "YOUR_API_KEY_HERE" &&
+    window.FIREBASE_CONFIG.projectId &&
+    window.FIREBASE_CONFIG.projectId !== "YOUR_PROJECT_ID"
+  );
 };
 

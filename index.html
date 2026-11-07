@@ -51,6 +51,46 @@
 
 <body class="bg-stage">
 
+  <!-- =========================================================================
+       GATEKEEPER & VERIFIER SCREEN (VERIFIES FIREBASE INVITATION PASSCODE)
+       ========================================================================= -->
+  <div class="verifier-overlay" id="verifierScreen">
+    <div class="verifier-card">
+      <img src="assets/ganesha-gold.svg" alt="Lord Ganesha" class="verifier-ganesha">
+      <div class="verifier-couples-title">Sriraksha &amp; Pannaga</div>
+      <div class="verifier-wedding-tag">Wedding E-Invitation</div>
+
+      <!-- State 1: Verification in Progress (Loading) -->
+      <div class="verifier-state-loading" id="verifierLoadingState">
+        <div class="verifier-spinner-ring">
+          <div class="spinner-core"></div>
+        </div>
+        <p class="verifier-status-text" id="verifierStatusText">Verifying your personalized invitation...</p>
+        <p class="verifier-subtext">Connecting to wedding registry • ದಯವಿಟ್ಟು ನಿರೀಕ್ಷಿಸಿ</p>
+      </div>
+
+      <!-- State 2: Invalid or Broken Link (Error) -->
+      <div class="verifier-state-error" id="verifierErrorState" style="display: none;">
+        <div class="verifier-error-icon-box">
+          <i class="fa-solid fa-link-slash"></i>
+        </div>
+        <h3 class="verifier-error-title">Unable to Fetch Invitation</h3>
+        <p class="verifier-error-desc" id="verifierErrorDesc">
+          The link might be broken or unable to fetch the e-invitation. Personalized invitations require a valid passkey from Sriraksha &amp; Pannaga's guest registry.
+        </p>
+        <div class="verifier-code-tried" id="verifierCodeTriedBox" style="display: none;">
+          Code: <code id="verifierCodeTried">None</code>
+        </div>
+        <p class="verifier-help-tip">
+          Please open the complete invitation link sent to you on WhatsApp, or contact the bride &amp; groom's family.
+        </p>
+        <button type="button" class="verifier-retry-btn" onclick="window.location.reload()">
+          <i class="fa-solid fa-rotate-right"></i> Try Again
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Floating Controls (Desktop Top-Bar / Mobile Bottom-Right FAB) -->
   <header class="floating-controls" id="floatingControls">
     <button id="langToggleBtn" class="control-btn lang-btn" aria-label="Toggle Kannada / English">
@@ -151,7 +191,7 @@
 
               <!-- Handwriting Recipient Name (editable / query param driven) -->
               <div class="guest-handwriting" id="guestNameDisplay" contenteditable="false" spellcheck="false">
-                Manjunatha Udupa and Family,<br>Bengaluru.
+                Writing your name digitally..<br>please wait..
               </div>
             </div>
           </div>
@@ -183,15 +223,7 @@
     <!-- ============================================== -->
     <!-- SECTION 2: CONTENT PAGE (ROYAL MAROON THEME)   -->
     <!-- ============================================== -->
-    <section class="card-screen content-screen" id="contentSection">
-
-      <!-- Royal Gold Ribbon / Return to Cover Button -->
-      <div class="return-cover-bar">
-        <button id="backToCoverBtn" class="back-cover-btn">
-          <i class="fa-solid fa-arrow-up"></i> <span data-i18n="backToIntroBtn">View Cover Page</span>
-        </button>
-      </div>
-
+    <section class="card-screen content-screen content-hidden" id="contentSection">
       <div class="card-wrapper content-card-wrapper" id="contentCard">
 
         <!-- Ornate Background Mandala Watermarks -->

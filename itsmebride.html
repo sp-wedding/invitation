@@ -6,7 +6,7 @@
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-9BR6ERWH32"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
+    function gtag() { dataLayer.push(arguments); }
     gtag('js', new Date());
 
     gtag('config', 'G-9BR6ERWH32');
@@ -781,41 +781,9 @@
       <div class="admin-title-badge">
         <i class="fa-solid fa-gem"></i> Bride's Management Portal
       </div>
-      <h1 class="admin-main-title">Sriraksha & Pannaga</h1>
-      <p class="admin-subtitle">Digital Wedding Invitation Distribution &amp; Guest Management</p>
+      <!-- <h1 class="admin-main-title">Sriraksha & Pannaga</h1>
+      <p class="admin-subtitle">Digital Wedding Invitation Distribution &amp; Guest Management</p> -->
     </header>
-
-    <!-- Status Bar -->
-    <div class="status-bar">
-      <div class="db-status-pill" id="dbStatusPill">
-        <div class="status-dot" id="statusDot"></div>
-        <span id="statusText">Checking database connection...</span>
-      </div>
-      <div style="display: flex; gap: 8px;">
-        <a href="index.html" target="_blank" class="settings-btn" title="Open Invitation Card">
-          <i class="fa-solid fa-arrow-up-right-from-square"></i> View Invitation
-        </a>
-        <button class="settings-btn" onclick="openSettingsModal()">
-          <i class="fa-solid fa-gear"></i> Settings
-        </button>
-      </div>
-    </div>
-
-    <!-- Metrics Cards -->
-    <div class="metrics-grid">
-      <div class="metric-card">
-        <div class="metric-num" id="totalCountDisplay">0</div>
-        <div class="metric-label">Invitations Created</div>
-      </div>
-      <div class="metric-card">
-        <div class="metric-num" id="totalViewsDisplay">0</div>
-        <div class="metric-label">Total Opens Recorded</div>
-      </div>
-      <div class="metric-card">
-        <div class="metric-num" id="activeRateDisplay">0%</div>
-        <div class="metric-label">Engagement Rate</div>
-      </div>
-    </div>
 
     <!-- Generator Box -->
     <div class="generator-card">
@@ -823,7 +791,7 @@
         <i class="fa-solid fa-wand-magic-sparkles"></i> Generate New Invitation
       </h2>
       <p class="card-desc">
-        Enter the guest or family name exactly as you'd like it to appear on the luxury handwritten "To" envelope.
+        Enter the guest or family name for the "To" envelope.
       </p>
 
       <form id="generateForm" onsubmit="handleGenerate(event)">
@@ -854,9 +822,41 @@
         </div>
 
         <button type="submit" class="generate-btn" id="generateSubmitBtn">
-          <i class="fa-solid fa-link"></i> Generate 8-Digit Unique Link
+          <i class="fa-solid fa-link"></i> Generate Link to Share
         </button>
       </form>
+    </div>
+
+    <!-- Status Bar -->
+    <div class="status-bar">
+      <div class="db-status-pill" id="dbStatusPill">
+        <div class="status-dot" id="statusDot"></div>
+        <span id="statusText">Checking database connection...</span>
+      </div>
+      <div style="display: flex; gap: 8px;">
+        <a href="index.html?to=at79hag6" target="_blank" id="viewInvitationLinkTop" class="settings-btn" title="Open Invitation Card">
+          <i class="fa-solid fa-arrow-up-right-from-square"></i> View Invitation
+        </a>
+        <button class="settings-btn" onclick="openSettingsModal()">
+          <i class="fa-solid fa-gear"></i> Settings
+        </button>
+      </div>
+    </div>
+
+    <!-- Metrics Cards -->
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-num" id="totalCountDisplay">0</div>
+        <div class="metric-label">Invitations Created</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-num" id="totalViewsDisplay">0</div>
+        <div class="metric-label">Total Opens Recorded</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-num" id="activeRateDisplay">0%</div>
+        <div class="metric-label">Engagement Rate</div>
+      </div>
     </div>
 
     <!-- Search & Filter Bar -->
@@ -1214,12 +1214,12 @@
         `॥ ಶ್ರೀ ಗಣೇಶಾಯ ನಮಃ ॥\n\n` +
         `Dear ${guestName},\n\n` +
         `With the divine blessings of Lord Ganesha and our elders, we cordially invite you and your family to celebrate the wedding ceremony of our beloved sister:\n\n` +
-        `💍 *SRIRAKSHA K R*\n` +
+        `👩🏻 *SRIRAKSHA K R*\n` +
         `with\n` +
-        `💐 *PANNAGA V BHAT*\n\n` +
+        `👦🏻 *PANNAGA V BHAT*\n\n` +
         `🗓 *Date:* Sunday, 6th December 2026 at 8:35 AM (Dhanur Lagna)\n` +
         `📍 *Venue:* Gayathri Mandira, Thirthahalli\n\n` +
-        `Please open your personalized digital invitation here:\n` +
+        `Please open your personalized digital invitation here: 💌\n` +
         `${fullUrl}\n\n` +
         `We seek your gracious presence, prayers, and blessings!\n` +
         `— Warmly, The Families of Sriraksha & Pannaga`
@@ -1279,12 +1279,16 @@
     // Render List
     function renderList(searchQuery = '') {
       const listEl = document.getElementById('invitationsList');
+      const topLinkBtn = document.getElementById('viewInvitationLinkTop');
+      if (topLinkBtn && invitations && invitations.length > 0) {
+        topLinkBtn.href = getInvitationShareUrl(invitations[0].code);
+      }
       const q = searchQuery.toLowerCase().trim();
 
       const filtered = invitations.filter(item => {
         if (!q) return true;
         return (item.guestName && item.guestName.toLowerCase().includes(q)) ||
-               (item.code && item.code.toLowerCase().includes(q));
+          (item.code && item.code.toLowerCase().includes(q));
       });
 
       if (filtered.length === 0) {
@@ -1307,7 +1311,7 @@
         });
 
         const views = item.viewCount || 0;
-        const viewBadge = views > 0 
+        const viewBadge = views > 0
           ? `<span class="view-count-badge"><i class="fa-solid fa-eye"></i> ${views} ${views === 1 ? 'view' : 'views'}</span>`
           : `<span class="view-count-badge unopened"><i class="fa-regular fa-clock"></i> Not opened yet</span>`;
 
@@ -1489,4 +1493,3 @@
 </body>
 
 </html>
-
