@@ -55,6 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
       muhurthamLabel: "Dhanur Lagna Auspicious Muhurtham",
       venueLabel: "Venue:",
       venueName: "Gayathri Mandira, Thirthahalli.",
+      liveMapHint: "Live Map • Thirthahalli",
       scanForLocation: "Scan QR code or click below to navigate",
       openInMapsBtn: "Locate on Google Maps",
 
@@ -108,6 +109,7 @@ document.addEventListener('DOMContentLoaded', () => {
       muhurthamLabel: "ಧನುರ್ ಲಗ್ನ ಶುಭ ಮುಹೂರ್ತದಲ್ಲಿ",
       venueLabel: "ಸ್ಥಳ:",
       venueName: "ಗಾಯತ್ರಿ ಮಂದಿರ, ತೀರ್ಥಹಳ್ಳಿ.",
+      liveMapHint: "ಲೈವ್ ಮ್ಯಾಪ್ • ತೀರ್ಥಹಳ್ಳಿ",
       scanForLocation: "ಸ್ಥಳದ ವಿವರಕ್ಕಾಗಿ QR ಕೋಡ್ ಸ್ಕ್ಯಾನ್ ಮಾಡಿ ಅಥವಾ ಕೆಳಗೆ ಒತ್ತಿ",
       openInMapsBtn: "ಗೂಗಲ್ ಮ್ಯಾಪ್ಸ್‌ನಲ್ಲಿ ವೀಕ್ಷಿಸಿ",
 

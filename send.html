@@ -412,23 +412,56 @@
               <h3 class="venue-heading-label" data-i18n="venueLabel">Venue:</h3>
               <h2 class="venue-name-title" data-i18n="venueName">Gayathri Mandira, Thirthahalli.</h2>
 
-              <!-- Thematic Royal QR Code Holder -->
-              <div class="qr-code-holder">
-                <a href="https://maps.google.com/?q=Gayathri+Mandira+Thirthahalli" target="_blank"
-                  rel="noopener noreferrer" class="thematic-qr-link"
-                  title="Open Gayathri Mandira, Thirthahalli on Google Maps">
-                  <div class="thematic-qr-wrapper" id="thematicVenueQR">
-                    <img src="assets/thematic-venue-qr.svg" alt="Venue QR Code - Gayathri Mandira, Thirthahalli"
-                      class="thematic-qr-svg" width="180" height="180">
-                  </div>
-                </a>
-                <p class="qr-instruction" data-i18n="scanForLocation">Scan QR code or click below to navigate</p>
+              <!-- Venue Architectural Photograph Showcase -->
+              <div class="venue-photo-card" onclick="openPhotoModal('assets/gayathri-mandira-photo.png')"
+                title="Click to view Gayathri Mandira">
+                <div class="venue-photo-aura"></div>
+                <div class="venue-photo-holder">
+                  <img src="assets/gayathri-mandira-photo.png" alt="Gayathri Mandira, Thirthahalli"
+                    class="venue-building-img" loading="lazy">
+                  <div class="venue-edge-gradient-l"></div>
+                  <div class="venue-edge-gradient-r"></div>
+                </div>
+              </div>
 
-                <a href="https://maps.google.com/?q=Gayathri+Mandira+Thirthahalli" target="_blank"
-                  rel="noopener noreferrer" class="map-link-btn">
-                  <i class="fa-solid fa-location-dot map-icon"></i>
-                  <span data-i18n="openInMapsBtn">Locate on Google Maps</span>
-                </a>
+              <!-- Unified Venue Live Map & Right-Aligned QR Navigation Stage -->
+              <div class="venue-navigation-stage">
+                <!-- Background Dark Themed Google Map -->
+                <div class="venue-map-background">
+                  <iframe class="venue-map-iframe"
+                    src="https://maps.google.com/maps?q=Gayathri+Mandira+Thirthahalli&t=m&z=15&ie=UTF8&iwloc=&output=embed"
+                    loading="lazy" allowfullscreen="" referrerpolicy="no-referrer-when-downgrade"
+                    title="Gayathri Mandira Location Map"></iframe>
+                  <div class="venue-map-gradient-overlay"></div>
+                  <!-- Clickable badge linking to Google Maps
+                  <a href="https://maps.google.com/?q=Gayathri+Mandira+Thirthahalli" target="_blank"
+                    rel="noopener noreferrer" class="venue-map-click-layer"
+                    title="Tap to open Gayathri Mandira on Google Maps">
+                    <span class="venue-map-badge">
+                      <i class="fa-solid fa-map-location-dot"></i>
+                      <span data-i18n="liveMapHint">Live Map • Thirthahalli</span>
+                    </span>
+                  </a> -->
+                </div>
+
+                <!-- Right-Aligned Royal QR Navigation Cluster -->
+                <div class="venue-qr-right-cluster">
+                  <a href="https://maps.google.com/?q=Gayathri+Mandira+Thirthahalli" target="_blank"
+                    rel="noopener noreferrer" class="thematic-qr-link"
+                    title="Open Gayathri Mandira, Thirthahalli on Google Maps">
+                    <div class="thematic-qr-wrapper" id="thematicVenueQR">
+                      <img src="assets/thematic-venue-qr.svg" alt="Venue QR Code - Gayathri Mandira, Thirthahalli"
+                        class="thematic-qr-svg" width="135" height="135">
+                    </div>
+                  </a>
+                  <p class="qr-instruction" data-i18n="scanForLocation">Scan QR code or click below to navigate</p>
+
+                  <a href="https://maps.google.com/?q=Gayathri+Mandira+Thirthahalli" target="_blank"
+                    rel="noopener noreferrer" class="map-link-btn">
+                    <i class="fa-solid fa-location-dot map-icon"></i>
+                    <span data-i18n="openInMapsBtn">Locate on Google Maps</span>
+                  </a>
+                </div>
               </div>
             </div>
 

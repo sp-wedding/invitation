@@ -19,7 +19,8 @@
 
   <!-- Open Graph Meta Tags -->
   <meta property="og:title" content="Bride's Portal • Sriraksha &amp; Pannaga Wedding Invitation Manager">
-  <meta property="og:description" content="Wedding invitation link distribution, guest personalization and RSVP management portal.">
+  <meta property="og:description"
+    content="Wedding invitation link distribution, guest personalization and RSVP management portal.">
   <meta property="og:image" content="https://sp-wedding.github.io/invitation/assets/meta-tag.png">
   <meta property="og:type" content="website">
 
@@ -840,7 +841,8 @@
         <span id="statusText">Checking database connection...</span>
       </div>
       <div style="display: flex; gap: 8px;">
-        <a href="send?to=at79hag6" target="_blank" id="viewInvitationLinkTop" class="settings-btn" title="Open Invitation Card">
+        <a href="send?to=at79hag6" target="_blank" id="viewInvitationLinkTop" class="settings-btn"
+          title="Open Invitation Card">
           <i class="fa-solid fa-arrow-up-right-from-square"></i> View Invitation
         </a>
         <button class="settings-btn" onclick="openSettingsModal()">
@@ -1225,14 +1227,14 @@
         `Dear ${guestName},\n\n` +
         `With the divine blessings of Lord Ganesha and our elders, we cordially invite you and your family to celebrate the wedding ceremony of\n\n` +
         `👩🏻 *SRIRAKSHA K R*\n` +
-        `with\n` +
+        `          with\n` +
         `👦🏻 *PANNAGA V BHAT*\n\n` +
-        `🗓 *Date:* Sunday, 6th December 2026 at 8:35 AM (Dhanur Lagna)\n` +
+        `🗓 *Date:* Sunday, 6th December 2026 at 8:35 AM\n` +
         `📍 *Venue:* Gayathri Mandira, Thirthahalli\n\n` +
         `Please open your personalized digital invitation here: 💌\n` +
         `${fullUrl}\n\n` +
         `We seek your gracious presence, prayers, and blessings!\n` +
-        `— Warmly, The Families of Sriraksha & Pannaga`
+        `— Warmly, The Families of Sriraksha & Pannaga.`
       );
 
       whatsappBtn.href = `https://api.whatsapp.com/send?text=${whatsappMsg}`;
