@@ -276,10 +276,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 2. CHECK 1: Does the link include a code? (Disallow bare links like ending with only index.html)
     if (!rawCode || !rawCode.trim()) {
-      showVerifierError(
-        "The link might be broken or unable to fetch the e-invitation.<br><br>Personalized wedding invitations require a valid passkey from Sriraksha &amp; Pannaga's guest registry. Links without an invitation code cannot be accessed.",
-        null
-      );
+      showVerifierError("The link might be broken or unable to fetch the e-invitation.", null);
       trackEvent('invitation_missing_code');
       return;
     }
@@ -289,10 +286,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 3. CHECK 2: Is it a valid alphanumeric code?
     const isAlphanumeric = /^[a-zA-Z0-9]{4,24}$/.test(code);
     if (!isAlphanumeric) {
-      showVerifierError(
-        "The link might be broken or unable to fetch the e-invitation.<br><br>The passkey in this link is not in a valid alphanumeric format.",
-        code
-      );
+      showVerifierError("The link might be broken or unable to fetch the e-invitation.", code);
       trackEvent('invitation_invalid_format', { code: code });
       return;
     }
@@ -368,10 +362,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 5. EVALUATION: Did code match registered invitations?
     if (!resolvedGuestName) {
-      showVerifierError(
-        "The link might be broken or unable to fetch the e-invitation.<br><br>The passkey was not found in Sriraksha &amp; Pannaga's guest registry.",
-        code
-      );
+      showVerifierError("The link might be broken or unable to fetch the e-invitation.", code);
       trackEvent('invitation_verify_failed', { code: code });
       return;
     }

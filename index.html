@@ -6,7 +6,7 @@
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-9BR6ERWH32"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
+    function gtag() { dataLayer.push(arguments); }
     gtag('js', new Date());
 
     gtag('config', 'G-9BR6ERWH32');
@@ -65,8 +65,7 @@
         <div class="verifier-spinner-ring">
           <div class="spinner-core"></div>
         </div>
-        <p class="verifier-status-text" id="verifierStatusText">Verifying your personalized invitation...</p>
-        <p class="verifier-subtext">Connecting to wedding registry • ದಯವಿಟ್ಟು ನಿರೀಕ್ಷಿಸಿ</p>
+        <p class="verifier-status-text" id="verifierStatusText">Fetching your personalized invitation...</p>
       </div>
 
       <!-- State 2: Invalid or Broken Link (Error) -->
@@ -76,13 +75,7 @@
         </div>
         <h3 class="verifier-error-title">Unable to Fetch Invitation</h3>
         <p class="verifier-error-desc" id="verifierErrorDesc">
-          The link might be broken or unable to fetch the e-invitation. Personalized invitations require a valid passkey from Sriraksha &amp; Pannaga's guest registry.
-        </p>
-        <div class="verifier-code-tried" id="verifierCodeTriedBox" style="display: none;">
-          Code: <code id="verifierCodeTried">None</code>
-        </div>
-        <p class="verifier-help-tip">
-          Please open the complete invitation link sent to you on WhatsApp, or contact the bride &amp; groom's family.
+          The link might be broken or unable to fetch the e-invitation.
         </p>
         <button type="button" class="verifier-retry-btn" onclick="window.location.reload()">
           <i class="fa-solid fa-rotate-right"></i> Try Again
@@ -312,7 +305,8 @@
                 <div class="spotlight-text-overlay">
                   <h3 class="spotlight-title" data-i18n="coupleStoryTitle">A Journey of Love &amp; Tradition</h3>
                   <p class="spotlight-quote" data-i18n="coupleStoryText">
-                    Two hearts, two souls, united in love and blessed by family. Join us as we begin our forever together in
+                    Two hearts, two souls, united in love and blessed by family. Join us as we begin our forever
+                    together in
                     the pristine beauty of Malnad.
                   </p>
                 </div>
@@ -402,7 +396,8 @@
               <!-- Thematic Royal QR Code Holder -->
               <div class="qr-code-holder">
                 <a href="https://maps.google.com/?q=Gayathri+Mandira+Thirthahalli" target="_blank"
-                  rel="noopener noreferrer" class="thematic-qr-link" title="Open Gayathri Mandira, Thirthahalli on Google Maps">
+                  rel="noopener noreferrer" class="thematic-qr-link"
+                  title="Open Gayathri Mandira, Thirthahalli on Google Maps">
                   <div class="thematic-qr-wrapper" id="thematicVenueQR">
                     <img src="assets/thematic-venue-qr.svg" alt="Venue QR Code - Gayathri Mandira, Thirthahalli"
                       class="thematic-qr-svg" width="180" height="180">
