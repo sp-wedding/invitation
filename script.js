@@ -308,47 +308,60 @@ document.addEventListener('DOMContentLoaded', () => {
     let resolvedGuestName = null;
     let isCloudVerified = false;
 
-    // A. Check Firestore if configured
+    // A. Check Firestore via Lightweight REST API (Zero SDK overhead, instant lookup)
     try {
       const config = window.FIREBASE_CONFIG || {};
       const savedProjectId = localStorage.getItem('sp_firebase_project_id');
       const savedApiKey = localStorage.getItem('sp_firebase_api_key');
-      if (savedProjectId) config.projectId = savedProjectId;
-      if (savedApiKey) config.apiKey = savedApiKey;
+      const projectId = savedProjectId || config.projectId;
+      const apiKey = savedApiKey || config.apiKey;
 
-      const isConfigured = window.isFirebaseConfigured ? window.isFirebaseConfigured() : Boolean(
-        config.apiKey &&
-        config.apiKey !== "YOUR_API_KEY_HERE" &&
-        config.projectId &&
-        config.projectId !== "YOUR_PROJECT_ID"
+      const isConfigured = Boolean(
+        apiKey &&
+        apiKey !== "YOUR_API_KEY_HERE" &&
+        projectId &&
+        projectId !== "YOUR_PROJECT_ID"
       );
 
-      if (isConfigured && typeof firebase !== 'undefined') {
-        if (!firebase.apps.length) {
-          firebase.initializeApp(config);
-        }
-        const firestore = firebase.firestore();
-        const docRef = firestore.collection('invitations').doc(code);
+      if (isConfigured) {
+        // Fast abort controller (3.5s timeout) to prevent long hangs on slow mobile networks
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 3500);
 
-        // Safety timeout of 6 seconds to prevent hanging on spotty connections
-        const fetchPromise = docRef.get();
-        const timeoutPromise = new Promise((_, reject) =>
-          setTimeout(() => reject(new Error('Firestore network timeout')), 6000)
-        );
+        const firestoreUrl = `https://firestore.googleapis.com/v1/projects/${encodeURIComponent(projectId)}/databases/(default)/documents/invitations/${encodeURIComponent(code)}?key=${encodeURIComponent(apiKey)}`;
 
-        const docSnap = await Promise.race([fetchPromise, timeoutPromise]);
+        try {
+          const res = await fetch(firestoreUrl, { signal: controller.signal });
+          clearTimeout(timeoutId);
 
-        if (docSnap && docSnap.exists) {
-          const data = docSnap.data();
-          if (data && data.guestName) {
-            resolvedGuestName = data.guestName;
-            isCloudVerified = true;
-            // Increment view count in Firestore
-            docRef.update({
-              viewCount: firebase.firestore.FieldValue.increment(1),
-              lastViewedAt: firebase.firestore.FieldValue.serverTimestamp()
-            }).catch(e => console.warn("View counter notice:", e));
+          if (res.ok) {
+            const docData = await res.json();
+            const fields = docData.fields || {};
+            if (fields.guestName && fields.guestName.stringValue) {
+              resolvedGuestName = fields.guestName.stringValue;
+              isCloudVerified = true;
+
+              // Background non-blocking viewCount & lastViewedAt update via REST PATCH
+              const currentViews = parseInt(fields.viewCount && fields.viewCount.integerValue ? fields.viewCount.integerValue : '0', 10);
+              const patchUrl = `https://firestore.googleapis.com/v1/projects/${encodeURIComponent(projectId)}/databases/(default)/documents/invitations/${encodeURIComponent(code)}?updateMask.fieldPaths=viewCount&updateMask.fieldPaths=lastViewedAt&key=${encodeURIComponent(apiKey)}`;
+              const patchBody = JSON.stringify({
+                fields: {
+                  viewCount: { integerValue: String(currentViews + 1) },
+                  lastViewedAt: { timestampValue: new Date().toISOString() }
+                }
+              });
+
+              fetch(patchUrl, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: patchBody,
+                keepalive: true
+              }).catch(e => console.warn("Background view count notice:", e));
+            }
           }
+        } catch (fetchErr) {
+          clearTimeout(timeoutId);
+          console.warn("Firestore REST notice:", fetchErr);
         }
       }
     } catch (err) {
@@ -404,18 +417,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Smoothly dismiss verifier screen
     if (verifierScreen) {
-      gsap.to(verifierScreen, {
-        opacity: 0,
-        duration: 0.6,
-        delay: 0.25,
-        ease: 'power2.out',
-        onComplete: () => {
+      if (typeof gsap !== 'undefined') {
+        gsap.to(verifierScreen, {
+          opacity: 0,
+          duration: 0.6,
+          delay: 0.25,
+          ease: 'power2.out',
+          onComplete: () => {
+            verifierScreen.style.display = 'none';
+            verifierScreen.classList.add('hidden');
+            startRevealCountdown();
+            smoothlyStartPetals();
+          }
+        });
+      } else {
+        verifierScreen.style.transition = 'opacity 0.4s ease';
+        verifierScreen.style.opacity = '0';
+        setTimeout(() => {
           verifierScreen.style.display = 'none';
           verifierScreen.classList.add('hidden');
           startRevealCountdown();
           smoothlyStartPetals();
-        }
-      });
+        }, 400);
+      }
     } else {
       startRevealCountdown();
       smoothlyStartPetals();
