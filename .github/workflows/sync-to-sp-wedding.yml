@@ -1,0 +1,23 @@
+name: Mirror to sp-wedding/invitation
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Mirror push to sp-wedding/invitation
+        if: ${{ env.SYNC_TOKEN != '' }}
+        env:
+          SYNC_TOKEN: ${{ secrets.SP_WEDDING_SYNC_TOKEN }}
+        run: |
+          git push --force https://x-access-token:${{ secrets.SP_WEDDING_SYNC_TOKEN }}@github.com/sp-wedding/invitation.git main:main
