@@ -834,7 +834,7 @@
         <span id="statusText">Checking database connection...</span>
       </div>
       <div style="display: flex; gap: 8px;">
-        <a href="index.html?to=at79hag6" target="_blank" id="viewInvitationLinkTop" class="settings-btn" title="Open Invitation Card">
+        <a href="send.html?to=at79hag6" target="_blank" id="viewInvitationLinkTop" class="settings-btn" title="Open Invitation Card">
           <i class="fa-solid fa-arrow-up-right-from-square"></i> View Invitation
         </a>
         <button class="settings-btn" onclick="openSettingsModal()">
@@ -1101,12 +1101,15 @@
       const customDomain = localStorage.getItem('sp_invite_base_url');
       if (customDomain && customDomain.trim()) {
         let base = customDomain.trim().replace(/\/+$/, '');
-        return `${base}/index.html`;
+        if (base.endsWith('.html') || base.endsWith('/send')) {
+          return base;
+        }
+        return `${base}/send.html`;
       }
       // Auto-detect current URL
       const currentLoc = window.location.href.split('?')[0].split('#')[0];
       const dirUrl = currentLoc.substring(0, currentLoc.lastIndexOf('/'));
-      return `${dirUrl}/index.html`;
+      return `${dirUrl}/send.html`;
     }
 
     function getInvitationShareUrl(code) {
@@ -1213,7 +1216,7 @@
       const whatsappMsg = encodeURIComponent(
         `॥ ಶ್ರೀ ಗಣೇಶಾಯ ನಮಃ ॥\n\n` +
         `Dear ${guestName},\n\n` +
-        `With the divine blessings of Lord Ganesha and our elders, we cordially invite you and your family to celebrate the wedding ceremony of our beloved sister:\n\n` +
+        `With the divine blessings of Lord Ganesha and our elders, we cordially invite you and your family to celebrate the wedding ceremony of\n\n` +
         `👩🏻 *SRIRAKSHA K R*\n` +
         `with\n` +
         `👦🏻 *PANNAGA V BHAT*\n\n` +

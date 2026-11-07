@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-9BR6ERWH32"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+
+    gtag('config', 'G-9BR6ERWH32');
+  </script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>Wedding Invitation | Sriraksha & Pannaga</title>
+
+  <!-- Meta for Social Sharing (WhatsApp, Facebook, iMessage) -->
+  <meta property="og:title" content="Wedding Invitation | Sriraksha & Pannaga">
+  <meta property="og:description"
+    content="We cordially invite you to celebrate the wedding of Sriraksha K R & Pannaga V Bhat on Sunday, Dec 6th, 2026 at Gayathri Mandira, Thirthahalli.">
+  <meta property="og:image" content="assets/couple-main.jpg">
+  <meta property="og:type" content="website">
+  <meta name="theme-color" content="#480c1d">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="assets/ganesha-gold.svg">
+
+  <!-- Font Awesome 6 Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Caveat:wght@600;700&family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@500;600;700;800;900&family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Marcellus&family=Noto+Serif+Kannada:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Montserrat:wght@300;400;500;600&display=swap"
+    rel="stylesheet">
+
+  <!-- GSAP, ScrollTrigger & ScrollToPlugin -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollToPlugin.min.js"></script>
+
+  <!-- Canvas Confetti for Petals & Celebrations -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="bg-stage">
+
+  <!-- =========================================================================
+       GATEKEEPER & VERIFIER SCREEN (VERIFIES FIREBASE INVITATION PASSCODE)
+       ========================================================================= -->
+  <div class="verifier-overlay" id="verifierScreen">
+    <div class="verifier-card">
+      <img src="assets/ganesha-gold.svg" alt="Lord Ganesha" class="verifier-ganesha">
+      <div class="verifier-couples-title">Sriraksha &amp; Pannaga</div>
+      <div class="verifier-wedding-tag">Wedding E-Invitation</div>
+
+      <!-- State 1: Verification in Progress (Loading) -->
+      <div class="verifier-state-loading" id="verifierLoadingState">
+        <div class="verifier-spinner-ring">
+          <div class="spinner-core"></div>
+        </div>
+        <p class="verifier-status-text" id="verifierStatusText">Fetching your personalized invitation...</p>
+      </div>
+
+      <!-- State 2: Invalid or Broken Link (Error) -->
+      <div class="verifier-state-error" id="verifierErrorState" style="display: none;">
+        <div class="verifier-error-icon-box">
+          <i class="fa-solid fa-link-slash"></i>
+        </div>
+        <h3 class="verifier-error-title">Unable to Fetch Invitation</h3>
+        <p class="verifier-error-desc" id="verifierErrorDesc">
+          The link might be broken or unable to fetch the e-invitation.
+        </p>
+        <button type="button" class="verifier-retry-btn" onclick="window.location.reload()">
+          <i class="fa-solid fa-rotate-right"></i> Try Again
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating Controls (Desktop Top-Bar / Mobile Bottom-Right FAB) -->
+  <header class="floating-controls" id="floatingControls">
+    <button id="langToggleBtn" class="control-btn lang-btn" aria-label="Toggle Kannada / English">
+      <i class="fa-solid fa-language lang-icon"></i>
+      <span id="langBtnText">ಕನ್ನಡ</span>
+    </button>
+    <button id="musicToggleBtn" class="control-btn music-btn" aria-label="Toggle Shehnai / Flute Music">
+      <i id="musicIcon" class="fa-solid fa-music music-icon"></i>
+      <span id="musicBtnText">Music</span>
+    </button>
+    <button id="petalsToggleBtn" class="control-btn petals-btn" aria-label="Trigger Flower Shower">
+      <i class="fa-solid fa-wand-magic-sparkles petals-icon"></i>
+      <span id="petalsBtnText">Petals</span>
+    </button>
+  </header>
+
+  <!-- Flower Shower Canvas Overlay -->
+  <canvas id="petalsCanvas" class="petals-canvas"></canvas>
+
+  <!-- MAIN WRAPPER -->
+  <main class="invitation-container" id="invitationApp">
+
+    <!-- ============================================== -->
+    <!-- SECTION 1: INTRO PAGE (LIGHT LUXURY CARD)       -->
+    <!-- ============================================== -->
+    <section class="card-screen intro-screen" id="introSection">
+      <div class="card-wrapper intro-card-wrapper" id="introCard">
+
+        <!-- Auspicious Arashina & Kunkuma (Turmeric & Kumkuma) Sacred Corner Blessings -->
+        <div class="kunkuma-corner top-left" aria-hidden="true">
+          <span class="dab arashina"></span>
+          <span class="dab kunkuma"></span>
+        </div>
+        <div class="kunkuma-corner top-right" aria-hidden="true">
+          <span class="dab arashina"></span>
+          <span class="dab kunkuma"></span>
+        </div>
+        <div class="kunkuma-corner bottom-left" aria-hidden="true">
+          <span class="dab arashina"></span>
+          <span class="dab kunkuma"></span>
+        </div>
+        <div class="kunkuma-corner bottom-right" aria-hidden="true">
+          <span class="dab arashina"></span>
+          <span class="dab kunkuma"></span>
+        </div>
+
+        <!-- Subtle Corner Floral Decorations -->
+        <div class="floral-corner top-left"></div>
+        <div class="floral-corner top-right"></div>
+        <div class="floral-corner bottom-left"></div>
+        <div class="floral-corner bottom-right"></div>
+
+        <!-- Arch Border Top & Bottom -->
+        <div class="ornate-arch-top"></div>
+        <div class="ornate-arch-bottom"></div>
+
+        <!-- Card Content Body -->
+        <div class="intro-inner-content">
+
+          <!-- Lord Ganesha Auspicious Motif -->
+          <div class="ganesha-container intro-ganesha">
+            <img src="assets/ganesha-maroon.svg" alt="Lord Ganesha" class="ganesha-svg-img">
+            <p class="invocation-text" data-i18n="invocation">|| Sri Ganeshaaya Namaha ||</p>
+          </div>
+
+          <!-- Wedding Invitation Header -->
+          <div class="intro-header-group">
+            <h1 class="invitation-title" data-i18n="weddingInvitation">WEDDING INVITATION</h1>
+            <div class="title-divider-line">
+              <span class="divider-diamond">♦</span>
+            </div>
+            <p class="intro-date-badge" data-i18n="weddingDateIntro">ON 6TH DEC 2026, SUNDAY</p>
+          </div>
+
+          <!-- Couple Names -->
+          <div class="intro-couple-box">
+            <h2 class="couple-name bride" data-i18n="introBrideName">SRIRAKSHA K R</h2>
+            <div class="intro-ampersand">&amp;</div>
+            <h2 class="couple-name groom" data-i18n="introGroomName">PANNAGA V BHAT</h2>
+          </div>
+
+          <!-- "TO" SECTION (Personalized Guest Section) -->
+          <div class="to-section-container">
+            <div class="to-header-row">
+              <span class="to-label" data-i18n="toLabel">TO</span>
+              <!-- <button class="edit-guest-btn" id="editGuestBtn" title="Customize guest name"
+                aria-label="Edit guest name">
+                <i class="fa-solid fa-pen-to-square"></i> <span class="edit-btn-text"
+                  data-i18n="editGuestTooltip">Customize</span>
+              </button> -->
+            </div>
+
+            <!-- Ruled Lines Card Frame with Handwriting Calligraphy Font -->
+            <div class="ruled-paper-box">
+              <div class="ruled-line line-1"></div>
+              <div class="ruled-line line-2"></div>
+              <div class="ruled-line line-3"></div>
+
+              <!-- Handwriting Recipient Name (editable / query param driven) -->
+              <div class="guest-handwriting" id="guestNameDisplay" contenteditable="false" spellcheck="false">
+                Writing your name digitally..<br>please wait..
+              </div>
+            </div>
+          </div>
+
+          <!-- 5-SECOND REVEAL PROGRESS BAR & OPEN NOW ACTION -->
+          <div class="intro-reveal-tray">
+            <div class="countdown-bar-wrapper">
+              <div class="reveal-status-text">
+                <span data-i18n="revealTimer">Revealing invitation in</span>
+                <span class="reveal-timer-num" id="revealTimerCount">5</span><span data-i18n="seconds">s</span>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill" id="revealProgressFill"></div>
+              </div>
+            </div>
+
+            <button class="open-invitation-btn" id="openInvitationBtn">
+              <span class="btn-shine"></span>
+              <span class="btn-text" data-i18n="openNowBtn">Open Invitation</span>
+              <i class="fa-solid fa-chevron-down btn-arrow"></i>
+            </button>
+          </div>
+
+        </div><!-- /.intro-inner-content -->
+      </div><!-- /.intro-card-wrapper -->
+    </section>
+
+
+    <!-- ============================================== -->
+    <!-- SECTION 2: CONTENT PAGE (ROYAL MAROON THEME)   -->
+    <!-- ============================================== -->
+    <section class="card-screen content-screen content-hidden" id="contentSection">
+      <div class="card-wrapper content-card-wrapper" id="contentCard">
+
+        <!-- Ornate Background Mandala Watermarks -->
+        <div class="content-mandala-bg"></div>
+        <div class="content-temple-arch-frame"></div>
+        <div class="gold-corner-filigree top-l"></div>
+        <div class="gold-corner-filigree top-r"></div>
+        <div class="gold-corner-filigree btm-l"></div>
+        <div class="gold-corner-filigree btm-r"></div>
+
+        <div class="content-inner-body">
+
+          <!-- Golden Ganesha Invocation -->
+          <div class="ganesha-container content-ganesha gs-reveal">
+            <div class="ganesha-halo"></div>
+            <img src="assets/ganesha-gold.svg" alt="Ganesha Motif" class="ganesha-svg-img gold-svg">
+            <p class="invocation-text gold-text" data-i18n="invocation">|| Sri Ganeshaaya Namaha ||</p>
+          </div>
+
+          <!-- Family Blessing Line -->
+          <p class="together-text gs-reveal" data-i18n="togetherWithFamilies">Together with our families</p>
+
+          <!-- Royal Couple Typography -->
+          <div class="content-couple-names gs-reveal">
+            <h1 class="royal-name bride gold-gradient-text" data-i18n="contentBrideName">SRIRAKSHA K R</h1>
+            <div class="royal-ampersand-wrapper">
+              <span class="royal-ampersand">&amp;</span>
+            </div>
+            <h1 class="royal-name groom gold-gradient-text" data-i18n="contentGroomName">PANNAGA V BHAT</h1>
+          </div>
+
+          <!-- Cordial Invitation Text -->
+          <p class="cordial-invitation-text gs-reveal" data-i18n="cordialInvite">
+            cordially invite you to join the occasion of our joyous commitment on
+          </p>
+
+          <!-- THE ROYAL DATE BLOCK (Faithful to Reference Card) -->
+          <div class="royal-date-block gs-reveal" id="dateBlock">
+            <div class="date-block-top">
+              <span class="month-title" data-i18n="month">DECEMBER</span>
+            </div>
+
+            <div class="date-block-middle">
+              <div class="date-col day-col">
+                <span class="date-day-label" data-i18n="day">SUNDAY</span>
+              </div>
+              <div class="date-col num-col">
+                <span class="date-num-large" data-i18n="date">06</span>
+              </div>
+              <div class="date-col time-col">
+                <span class="date-time-label" data-i18n="time">8:35 AM</span>
+              </div>
+            </div>
+
+            <div class="date-block-bottom">
+              <span class="year-title" data-i18n="year">2026</span>
+            </div>
+          </div>
+
+          <!-- Auspicious Muhurtham Tagline -->
+          <div class="muhurtham-badge-wrapper gs-reveal">
+            <div class="muhurtham-pill">
+              <i class="fa-solid fa-om kalash-icon"></i>
+              <span class="muhurtham-text" data-i18n="muhurthamLabel">Dhanur Lagna Auspicious Muhurtham</span>
+            </div>
+          </div>
+
+          <!-- ============================================== -->
+          <!-- COUPLE SPOTLIGHT & GALLERY SECTION             -->
+          <!-- ============================================== -->
+          <div class="couple-spotlight-section gs-reveal">
+            <div class="section-gold-divider">
+              <span>❧</span>
+            </div>
+
+            <!-- Couple Spotlight Card with Overlaid Bottom Text -->
+            <div class="couple-spotlight-card">
+              <div class="couple-cutout-container">
+                <div class="cutout-img-holder">
+                  <div class="cutout-aura"></div>
+                  <img src="assets/couple-cutout.png" alt="Sriraksha & Pannaga" class="couple-cutout-img">
+                  <div class="cutout-bottom-gradient"></div>
+                </div>
+
+                <!-- Text overlaid directly on the bottom feathered portion of the image -->
+                <div class="spotlight-text-overlay">
+                  <h3 class="spotlight-title" data-i18n="coupleStoryTitle">A Journey of Love &amp; Tradition</h3>
+                  <p class="spotlight-quote" data-i18n="coupleStoryText">
+                    Two hearts, two souls, united in love and blessed by family. Join us as we begin our forever
+                    together in
+                    the pristine beauty of Malnad.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Pre-wedding Photo Gallery Showcase
+            <div class="gallery-wrapper">
+              <h4 class="gallery-header" data-i18n="viewGallery">Pre-Wedding Moments</h4>
+
+              <div class="gallery-scroller" id="galleryScroller">
+                <div class="gallery-item" onclick="openPhotoModal('assets/couple-main.jpg')">
+                  <img src="assets/couple-main.jpg" alt="Sriraksha & Pannaga Portrait" loading="lazy">
+                  <div class="item-overlay"><span>🔍</span></div>
+                </div>
+                <div class="gallery-item" onclick="openPhotoModal('assets/couple-opt1.jpg')">
+                  <img src="assets/couple-opt1.jpg" alt="By the Riverbank" loading="lazy">
+                  <div class="item-overlay"><span>🔍</span></div>
+                </div>
+                <div class="gallery-item" onclick="openPhotoModal('assets/couple-opt2.jpg')">
+                  <img src="assets/couple-opt2.jpg" alt="Grace & Joy" loading="lazy">
+                  <div class="item-overlay"><span>🔍</span></div>
+                </div>
+                <div class="gallery-item" onclick="openPhotoModal('assets/couple-opt3.jpg')">
+                  <img src="assets/couple-opt3.jpg" alt="Together in Nature" loading="lazy">
+                  <div class="item-overlay"><span>🔍</span></div>
+                </div>
+                <div class="gallery-item" onclick="openPhotoModal('assets/couple-sub.jpg')">
+                  <img src="assets/couple-sub.jpg" alt="Memories" loading="lazy">
+                  <div class="item-overlay"><span>🔍</span></div>
+                </div>
+              </div>
+            </div>
+          </div> -->
+
+            <!-- ============================================== -->
+            <!-- LIVE COUNTDOWN TIMER TO DEC 6, 2026, 8:35 AM   -->
+            <!-- ============================================== -->
+            <div class="countdown-card gs-reveal">
+              <h3 class="countdown-heading" data-i18n="countdownTitle">Counting Down to the Big Day</h3>
+
+              <div class="timer-grid">
+                <div class="timer-cell">
+                  <span class="timer-digits" id="timerDays">00</span>
+                  <span class="timer-label" data-i18n="days">Days</span>
+                </div>
+                <div class="timer-divider">:</div>
+                <div class="timer-cell">
+                  <span class="timer-digits" id="timerHours">00</span>
+                  <span class="timer-label" data-i18n="hours">Hours</span>
+                </div>
+                <div class="timer-divider">:</div>
+                <div class="timer-cell">
+                  <span class="timer-digits" id="timerMinutes">00</span>
+                  <span class="timer-label" data-i18n="minutes">Mins</span>
+                </div>
+                <div class="timer-divider">:</div>
+                <div class="timer-cell">
+                  <span class="timer-digits" id="timerSeconds">00</span>
+                  <span class="timer-label" data-i18n="secondsLabel">Secs</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- ============================================== -->
+            <!-- ACTION BUTTONS: CALENDAR & WHATSAPP RSVP       -->
+            <!-- ============================================== -->
+            <div class="action-buttons-container gs-reveal">
+              <button class="action-btn calendar-action-btn" id="calendarBtn">
+                <i class="fa-solid fa-calendar-check action-icon"></i>
+                <span data-i18n="addToCalendarBtn">Add to Calendar</span>
+              </button>
+
+              <!-- <button class="action-btn whatsapp-action-btn" id="whatsappBtn">
+              <i class="fa-brands fa-whatsapp action-icon whatsapp-fa-icon"></i>
+              <span data-i18n="rsvpWhatsAppBtn">Send Wishes on WhatsApp</span>
+            </button> -->
+            </div>
+
+            <!-- ============================================== -->
+            <!-- VENUE & NAVIGATION SECTION (SCANNABLE QR)      -->
+            <!-- ============================================== -->
+            <div class="venue-showcase-box gs-reveal">
+              <h3 class="venue-heading-label" data-i18n="venueLabel">Venue:</h3>
+              <h2 class="venue-name-title" data-i18n="venueName">Gayathri Mandira, Thirthahalli.</h2>
+
+              <!-- Thematic Royal QR Code Holder -->
+              <div class="qr-code-holder">
+                <a href="https://maps.google.com/?q=Gayathri+Mandira+Thirthahalli" target="_blank"
+                  rel="noopener noreferrer" class="thematic-qr-link"
+                  title="Open Gayathri Mandira, Thirthahalli on Google Maps">
+                  <div class="thematic-qr-wrapper" id="thematicVenueQR">
+                    <img src="assets/thematic-venue-qr.svg" alt="Venue QR Code - Gayathri Mandira, Thirthahalli"
+                      class="thematic-qr-svg" width="180" height="180">
+                  </div>
+                </a>
+                <p class="qr-instruction" data-i18n="scanForLocation">Scan QR code or click below to navigate</p>
+
+                <a href="https://maps.google.com/?q=Gayathri+Mandira+Thirthahalli" target="_blank"
+                  rel="noopener noreferrer" class="map-link-btn">
+                  <i class="fa-solid fa-location-dot map-icon"></i>
+                  <span data-i18n="openInMapsBtn">Get Directions on Google Maps</span>
+                </a>
+              </div>
+            </div>
+
+            <!-- Traditional Shloka / Blessing Footer -->
+            <footer class="content-card-footer gs-reveal">
+              <p class="footer-shloka">
+                ॥ ಮಂಗಲಂ ಭಗವಾನ್ ವಿಷ್ಣುಃ ಮಂಗಲಂ ಗರುಡಧ್ವಜಃ ॥<br>
+                ॥ ಮಂಗಲಂ ಪುಂಡರೀಕಾಕ್ಷಃ ಮಂಗಲಾಯತನೋ ಹರಿಃ ॥
+              </p>
+              <p class="footer-warmth">
+                Warmly Invited by: <strong>The Families of Sriraksha &amp; Pannaga</strong>
+              </p>
+            </footer>
+
+          </div><!-- /.content-inner-body -->
+        </div><!-- /.content-card-wrapper -->
+    </section>
+
+  </main>
+
+  <!-- Photo Lightbox Modal -->
+  <div id="photoModal" class="photo-modal" onclick="closePhotoModal()">
+    <span class="modal-close-btn">&times;</span>
+    <img id="modalImg" class="modal-image" src="" alt="Enlarged Wedding Photo">
+  </div>
+
+  <!-- Custom Guest Name Edit Modal -->
+  <div id="editGuestModal" class="edit-guest-modal">
+    <div class="edit-guest-dialog">
+      <h3 class="dialog-title">Personalize "To" Field</h3>
+      <p class="dialog-desc">Enter the guest name(s) and place:</p>
+      <input type="text" id="guestNameInput" class="guest-name-input"
+        placeholder="e.g. Ramesh Hegde and Family, Shivamogga">
+      <div class="dialog-btn-row">
+        <button id="cancelGuestEditBtn" class="dialog-btn cancel-btn">Cancel</button>
+        <button id="copyShareLinkBtn" class="dialog-btn copy-btn"><i class="fa-solid fa-copy"></i> Copy Link</button>
+        <button id="saveGuestEditBtn" class="dialog-btn save-btn">Update Card</button>
+      </div>
+      <p id="copyFeedback" class="copy-feedback-text"
+        style="display:none; color:#1a7f37; font-weight:600; margin-top:8px; font-size:0.85rem;"><i
+          class="fa-solid fa-check"></i> Personalized link copied to clipboard!</p>
+      <p class="dialog-tip">Tip: You can share personalized links using <code>?to=Your+Guest+Name</code>!</p>
+    </div>
+  </div>
+
+  <!-- Firebase Compat SDKs (For Firestore Invitation Code Resolution) -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js"></script>
+
+  <!-- Main JavaScript Logic -->
+  <script src="script.js"></script>
+</body>
+
+</html>

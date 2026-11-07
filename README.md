@@ -41,7 +41,8 @@ An interactive, luxury digital wedding invitation web app designed for mobile & 
 
 ```text
 SP-wedding e-invitation/
-├── index.html                  # Main responsive single-page wedding invitation
+├── send.html                   # Primary short-link responsive wedding invitation
+├── index.html                  # Seamless redirect to send.html (for root domain access)
 ├── itsmebride.html             # Bride's Portal: Link generator, guest management & tracking
 ├── firebase-config.js          # Firestore configuration for cloud database sync
 ├── style.css                   # Responsive layout, cards, gradients & animations

@@ -266,11 +266,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const params = new URLSearchParams(window.location.search);
     let rawCode = params.get('to') || params.get('code') || params.get('id') || params.get('pass') || params.get('key');
 
-    // Also check pathname (e.g. /invitation/at79hag6 or /at79hag6)
+    // Also check pathname (e.g. /invitation/at79hag6 or /send/at79hag6 or /at79hag6)
     if (!rawCode) {
-      const pathMatch = window.location.pathname.match(/\/(?:invitation\/)?([a-zA-Z0-9]{4,24})\/?$/);
-      if (pathMatch) {
-        rawCode = pathMatch[1];
+      const pathClean = window.location.pathname.replace(/\.(?:html|htm|php)$/i, '').replace(/\/+$/, '');
+      const segments = pathClean.split('/').filter(Boolean);
+      const lastSegment = segments[segments.length - 1];
+      if (lastSegment && lastSegment !== 'send' && lastSegment !== 'index' && lastSegment !== 'itsmebride') {
+        const isCodeCandidate = /^[a-zA-Z0-9]{4,24}$/.test(lastSegment);
+        if (isCodeCandidate) {
+          rawCode = lastSegment;
+        }
       }
     }
 
